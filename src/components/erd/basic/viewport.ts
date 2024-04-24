@@ -68,22 +68,6 @@ export class Viewport extends View {
         })
     }
 
-    mouseDown(x: number, y: number): boolean {
-        let hitChild = false;
-        if (this.isInArea(x, y)) {
-            for (let i = this.children.length - 1; i >= 0; i--) {
-                if (this.children[i].mouseDown(x, y)) {
-                    hitChild = true;
-                    break;
-                }
-            }
-            if (!hitChild)
-                this.emit('mousedown', x, y);
-            return true;
-        }
-        return false;
-    }
-
     setMouseAction(mouseAction: MouseAction) {
         this.mouseAction = mouseAction;
         return this;
