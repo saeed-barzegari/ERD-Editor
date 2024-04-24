@@ -55,6 +55,13 @@ export class Viewport extends View {
             }
         }
         this.addListener('mousedown', (x: number, y: number) => {
+            let hit = false;
+            this.children.forEach(child =>{
+                if(child.isInArea(x, y))
+                    hit = true
+            })
+            if(hit) return;
+
             startX = x;
             startY = y;
             this.addListener('mousemove', mouseMoveListener)
