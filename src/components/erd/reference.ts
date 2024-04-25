@@ -28,6 +28,7 @@ export class Reference extends Path {
         this.addPoint(0, 0)
         this.addPoint(0, 0);
         this.addPoint(0, 0);
+        this.addPoint(0, 0);
     }
 
     getPointDirection(base: Table, destX: number, destY: number) {
@@ -86,41 +87,54 @@ export class Reference extends Path {
     }
 
     draw(context: CanvasRenderingContext2D) {
-        const startDirection = this.getPointDirection(this.fromTable, this.toTable.getCenterX(), this.toTable.getCenterY())
+        const startDirection =
+            this.fromTable == this.toTable ?
+                PointDirection.Top :
+                this.getPointDirection(this.fromTable, this.toTable.getCenterX(), this.toTable.getCenterY());
         const startX = this.getPointPositionX(this.fromTable, startDirection);
         const startY = this.getPointPositionY(this.fromTable, startDirection);
-        const endDirection = this.getPointDirection(this.toTable, startX, startY);
+        const endDirection =
+            this.fromTable == this.toTable ?
+                PointDirection.Right :
+                this.getPointDirection(this.toTable, startX, startY);
         const endX = this.getPointPositionX(this.toTable, endDirection);
         const endY = this.getPointPositionY(this.toTable, endDirection);
 
         this.change(0, startX, startY);
-        if (this.directionIsVertical(startDirection) && this.directionIsHorizontal(endDirection)) {
-            this.change(1, startX, endY);
-            this.change(2, startX, endY);
-        } else if (this.directionIsHorizontal(startDirection) && this.directionIsVertical(endDirection)) {
-            this.change(1, endX, startY);
-            this.change(2, endX, startY);
-        } else if (this.directionIsHorizontal(startDirection) && this.directionIsHorizontal(endDirection)) {
-            const middleX = (startX + endX) / 2
-            this.change(1, middleX, startY);
-            this.change(2, middleX, endY);
-        } else {
-            const middleY = (startY + endY) / 2
-            this.change(1, startX, middleY);
-            this.change(2, endX, middleY);
+        if(this.fromTable == this.toTable){
+            this.change(1, startX, startY - 50);
+            this.change(2, endX + 50, startY - 50);
+            this.change(3, endX + 50, endY);
+        }else {
+            if (this.directionIsVertical(startDirection) && this.directionIsHorizontal(endDirection)) {
+                this.change(1, startX, endY);
+                this.change(2, startX, endY);
+            } else if (this.directionIsHorizontal(startDirection) && this.directionIsVertical(endDirection)) {
+                this.change(1, endX, startY);
+                this.change(2, endX, startY);
+            } else if (this.directionIsHorizontal(startDirection) && this.directionIsHorizontal(endDirection)) {
+                const middleX = (startX + endX) / 2
+                this.change(1, middleX, startY);
+                this.change(2, middleX, endY);
+            } else {
+                const middleY = (startY + endY) / 2
+                this.change(1, startX, middleY);
+                this.change(2, endX, middleY);
+            }
+            this.change(3, endX, endY);
         }
-        this.change(3, endX, endY);
+        this.change(4, endX, endY);
         super.draw(context);
 
         context.save()
         if (Reference.notation == ReferenceNotation.IDEF1X) {
-            const circlePosition = this.shiftPositionWithDirection(new Point(startX - 4, startY - 4), startDirection,4)
+            const circlePosition = this.shiftPositionWithDirection(new Point(startX - 4, startY - 4), startDirection, 4)
 
             context.beginPath();
             context.roundRect(circlePosition.x, circlePosition.y, 8, 8, 20)
             context.fillStyle = "#9498a6"
             context.fill()
-        } else if(Reference.notation == ReferenceNotation.CrowsFoot){
+        } else if (Reference.notation == ReferenceNotation.CrowsFoot) {
             true // todo: implement
         }
         context.restore()
