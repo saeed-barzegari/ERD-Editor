@@ -308,6 +308,11 @@ export abstract class Element extends EventEmitter {
         return pos.addPoint(canvas.offset).mul(canvas.scale);
     }
 
+    convertToLocal(pos:Point){
+        const canvas = Canvas.getSingleton();
+        return pos.div(canvas.scale).subPoint(canvas.offset);
+    }
+
     getGlobalPosition() {
         return this.convertToGlobal(this.position.copy());
     }

@@ -56,9 +56,10 @@ export class Erd extends Viewport {
             }
 
             let hit = false;
-            const mousePosition = this.convertToGlobal(new Point(ev.offsetX, ev.offsetY))
+            const mousePosition = new Point(ev.offsetX, ev.offsetY);
+            const localMousePosition = this.convertToLocal(mousePosition.copy())
             this.children.forEach(child => {
-                if (child.isInArea(mousePosition.x, mousePosition.y)) {
+                if (child.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
                     this.table = child as Table;
                     this.emit('contextmenu', mousePosition, ContextMenuContent.TableContextMenu);
@@ -67,14 +68,14 @@ export class Erd extends Viewport {
             if (hit) return;
 
             this.reference.forEach(ref => {
-                if (ref.isInArea(mousePosition.x, mousePosition.y)) {
+                if (ref.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
                     this.emit('contextmenu', mousePosition, ContextMenuContent.ReferenceContextMenu)
                 }
             })
             if (hit) return;
 
-            if (this.isInArea(mousePosition.x, mousePosition.y))
+            if (this.isInArea(localMousePosition.x, localMousePosition.y))
                 this.emit('contextmenu', mousePosition, ContextMenuContent.CanvasContextMenu)
         })
     }
