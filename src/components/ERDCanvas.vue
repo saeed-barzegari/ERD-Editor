@@ -90,6 +90,7 @@ export default defineComponent({
     this.erd.addListener('contextmenu', (pos, context: ContextMenuContent) => {
       this.contextMenuContent = context;
       this.showContextMenu(pos.x, pos.y);
+      this.table = this.erd.table;
     })
   }
 })

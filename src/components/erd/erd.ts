@@ -44,7 +44,8 @@ export class Erd extends Viewport {
             this.children.forEach(child => {
                 if (child.isInArea(mousePosition.x, mousePosition.y)) {
                     hit = true;
-                    this.emit('contextmenu', mousePosition, ContextMenuContent.TableContextMenu)
+                    this.table = child as Table;
+                    this.emit('contextmenu', mousePosition, ContextMenuContent.TableContextMenu);
                 }
             })
             if (hit) return;
