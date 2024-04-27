@@ -55,6 +55,13 @@ export class Viewport extends View {
             }
         }
         this.addListener('mousedown', (x: number, y: number) => {
+            let hit = false;
+            this.children.forEach(child =>{
+                if(child.isInArea(x, y))
+                    hit = true
+            })
+            if(hit) return;
+
             startX = x;
             startY = y;
             this.addListener('mousemove', mouseMoveListener)
@@ -66,22 +73,6 @@ export class Viewport extends View {
             const canvas = Canvas.getSingleton();
             canvas.scale = Math.max(0.25, Math.min(4, canvas.scale + deltaY / 400));
         })
-    }
-
-    mouseDown(x: number, y: number): boolean {
-        let hitChild = false;
-        if (this.isInArea(x, y)) {
-            for (let i = this.children.length - 1; i >= 0; i--) {
-                if (this.children[i].mouseDown(x, y)) {
-                    hitChild = true;
-                    break;
-                }
-            }
-            if (!hitChild)
-                this.emit('mousedown', x, y);
-            return true;
-        }
-        return false;
     }
 
     setMouseAction(mouseAction: MouseAction) {

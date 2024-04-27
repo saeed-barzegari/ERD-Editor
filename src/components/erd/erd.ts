@@ -38,7 +38,23 @@ export class Erd extends Viewport {
 
     mouseHandler() {
         super.mouseHandler();
+        this.addListener('mousedown', (x:number, y:number)=>{
+            console.log('mouse down ref')
+            if(this.mode == ERDMode.Referencing) {
+                this.children.forEach(child => {
+                    if (child.isInArea(x, y)) {
+                        this.reference.push(new Reference(this.table, child as Table));
+                        this.mode = ERDMode.Editing;
+                    }
+                })
+            }
+        })
         document.addEventListener('contextmenu', ev => {
+            if (this.mode == ERDMode.Referencing){
+                this.mode = ERDMode.Editing;
+                return;
+            }
+
             let hit = false;
             const mousePosition = this.convertToGlobal(new Point(ev.offsetX, ev.offsetY))
             this.children.forEach(child => {
