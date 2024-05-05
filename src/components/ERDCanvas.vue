@@ -65,6 +65,32 @@ export default defineComponent({
       this.table.name = target.value; // TODO: check for duplicate table name
       target.value = "";
     },
+    startColumnDrag(ev: DragEvent, list: number, columnIndex: number) {
+      ev.dataTransfer?.setData("columnIndex", columnIndex.toString());
+      ev.dataTransfer?.setData("columnList", list.toString());
+      ev.dataTransfer?.setData("columnHeight", (ev.target as HTMLElement).parentElement?.offsetHeight.toString() as string);
+    },
+    onDropColumn(ev: DragEvent, list: number) {
+      ev.preventDefault();
+      const columnIndex = parseInt(ev.dataTransfer?.getData("columnIndex") as string);
+      const columnList = parseInt(ev.dataTransfer?.getData("columnList") as string);
+      const columnHeight = parseInt(ev.dataTransfer?.getData("columnHeight") as string);
+      const column = (columnList == 0 ? this.table.primaryKeyColumns[columnIndex] : this.table.columns[columnIndex]) as TableColumn;
+      const dropZone = (list == 0 ? this.$refs.primaryKeyZone : this.$refs.nonPrimaryKeyZone) as HTMLElement;
+      const dropZoneRect = dropZone.getBoundingClientRect() as DOMRect;
+      const index = Math.floor((ev.clientY - dropZoneRect.y + columnHeight / 2) / columnHeight)
+
+      if (columnList != list){
+        this.table.removeColumn(column);
+        column.primaryKey = !column.primaryKey;
+        this.table.addColumn(column, index);
+      } else {
+        if(columnList == 0)
+          this.table.primaryKeyColumns.move(columnIndex, index);
+        else
+          this.table.columns.move(columnIndex, index);
+      }
+    }
   },
   data() {
     return {
@@ -121,18 +147,24 @@ export default defineComponent({
         <input @focusout="changeTableName" ref="tableName" v-model="table.name">
       </div>
       <div class="columns">
-        <div class="pk-columns">
-          <input v-for="(column, index) in table.primaryKeyColumns" v-bind:key="index" v-model="column.name">
+        <div class="pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 0)" ref="primaryKeyZone">
+          <div class="column" v-for="(column, index) in table.primaryKeyColumns" v-bind:key="index">
+            <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
+            <input v-model="column.name">
+          </div>
           <input
               @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn(new TableColumn((ev.target as HTMLInputElement).value).setPrimaryKey(true)); (ev.target as HTMLInputElement).value ='';}">
         </div>
         <hr style="width: 100%">
-        <div class="non-pk-columns">
-          <input v-for="(column, index) in table.columns" v-bind:key="index" v-model="column.name">
+        <div class="non-pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 1)" ref="nonPrimaryKeyZone">
+          <div class="column" v-for="(column, index) in table.columns" v-bind:key="index">
+            <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
+            <input v-model="column.name">
+          </div>
           <input
               @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn(new TableColumn((ev.target as HTMLInputElement).value)); (ev.target as HTMLInputElement).value ='';}">
         </div>
-      </div>
+        </div>
     </div>
   </div>
 </template>
@@ -190,5 +222,16 @@ export default defineComponent({
   padding: 4px;
   margin: 2px 0;
   border: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.column .drag {
+  align-content: center;
+  padding: 5px;
 }
 </style>

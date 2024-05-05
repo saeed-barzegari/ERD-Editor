@@ -63,13 +63,13 @@ export class Table extends Column implements Selectable {
 
     addColumn(column: TableColumn, index = -1) {
         if (column.primaryKey) {
-            if (index > 0)
+            if (index >= 0)
                 this._primaryKeyColumns.splice(index, 0, column);
             else
                 this._primaryKeyColumns.push(column)
             this.emit("add-column", column)
         } else {
-            if (index > 0)
+            if (index >= 0)
                 this._columns.splice(index, 0, column);
             else
                 this._columns.push(column)
