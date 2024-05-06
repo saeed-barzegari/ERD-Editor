@@ -1,6 +1,7 @@
 import {Path} from "@/components/erd/basic/path";
 import {Table} from "@/components/erd/table";
 import {Point} from "@/components/erd/basic/point";
+import {TableColumn} from "@/components/erd/table-column";
 
 enum PointDirection {
     Top,
@@ -29,6 +30,22 @@ export class Reference extends Path {
         this.addPoint(0, 0);
         this.addPoint(0, 0);
         this.addPoint(0, 0);
+
+        for(const column of this.toTable.primaryKeyColumns){
+            this.registerColumnToForeignKey(column)
+        }
+        this.toTable.addListener("add-column", (column:TableColumn)=>{
+            if (!column.primaryKey || column.foreignKey) return;
+            this.registerColumnToForeignKey(column)
+        })
+    }
+
+    private registerColumnToForeignKey(referenceColumn:TableColumn, foreignKeyColumn?:TableColumn){
+        const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(referenceColumn.name);
+        fkColumn.foreignKey = true;
+        this.fromTable.addColumn(fkColumn);
+        referenceColumn.addListener("changeName", name => fkColumn.name = name); // TODO: if name is not auto generate this not listening
+        referenceColumn.addListener("changePrimaryKey", ()=>{this.fromTable.removeColumn(fkColumn)})
     }
 
     getPointDirection(base: Table, destX: number, destY: number) {
