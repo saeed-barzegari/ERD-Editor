@@ -1,17 +1,35 @@
 import {Point} from "@/components/erd/basic/point";
+import {EventEmitter} from "events";
 
-export class Path {
+export class Path extends EventEmitter {
+
     private _positions: Point[];
     private _color:string;
+    private _lineDash:number[];
 
     constructor(color = "white") {
+        super();
         this._positions = [];
         this._color = color;
+        this._lineDash = [];
     }
 
     setColor(color:string){
         this._color = color;
         return this;
+    }
+
+    setLineDash(lineDash:number[]){
+        this._lineDash = lineDash;
+        return this;
+    }
+
+    get lineDash(): number[] {
+        return this._lineDash;
+    }
+
+    set lineDash(value: number[]) {
+        this._lineDash = value;
     }
 
     addPoint(x: number, y: number) {
@@ -31,7 +49,7 @@ export class Path {
         context.beginPath();
         context.strokeStyle = this._color
         context.lineWidth = 1;
-        context.setLineDash([5, 5])
+        context.setLineDash(this._lineDash)
         context.moveTo(this._positions[0].x, this._positions[0].y)
         for (let i = 1; i < this._positions.length; i++) {
             const position = this._positions[i];

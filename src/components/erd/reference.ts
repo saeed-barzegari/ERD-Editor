@@ -18,6 +18,8 @@ export enum ReferenceNotation {
 export class Reference extends Path {
     fromTable: Table;
     toTable: Table;
+    foreignKeyColumns:TableColumn[] = [];
+    _identifying = false;
     static notation: ReferenceNotation = ReferenceNotation.IDEF1X;
 
     constructor(fromTable: Table, toTable: Table) {
@@ -31,6 +33,10 @@ export class Reference extends Path {
         this.addPoint(0, 0);
         this.addPoint(0, 0);
 
+        const lineDash = [5, 5];
+        this.lineDash = lineDash;
+        this.addListener("changeIdentifying", value => this.lineDash = value? [] : lineDash)
+
         for(const column of this.toTable.primaryKeyColumns){
             this.registerColumnToForeignKey(column)
         }
@@ -42,10 +48,24 @@ export class Reference extends Path {
 
     private registerColumnToForeignKey(referenceColumn:TableColumn, foreignKeyColumn?:TableColumn){
         const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(referenceColumn.name);
+        this.foreignKeyColumns.push(fkColumn);
         fkColumn.foreignKey = true;
         this.fromTable.addColumn(fkColumn);
         referenceColumn.addListener("changeName", name => fkColumn.name = name); // TODO: if name is not auto generate this not listening
-        referenceColumn.addListener("changePrimaryKey", ()=>{this.fromTable.removeColumn(fkColumn)})
+        referenceColumn.addListener("changePrimaryKey", () => {
+            this.fromTable.removeColumn(fkColumn);
+            this.foreignKeyColumns.remove(this.foreignKeyColumns.indexOf(fkColumn));
+        })
+        fkColumn.addListener("changePrimaryKey",(value)=>{
+            if(!value && !this._identifying || value && this._identifying) return;
+            let identifying = true;
+            this.foreignKeyColumns.forEach(column => {
+                if(!column.primaryKey)
+                    identifying = false;
+            })
+            this._identifying = identifying;
+            this.emit("changeIdentifying", identifying);
+        })
     }
 
     getPointDirection(base: Table, destX: number, destY: number) {
@@ -184,10 +204,13 @@ export class Reference extends Path {
     }
 
     get identifying(){
-        return true; // TODO
+        return this._identifying;
     }
 
     set identifying(value){
-        true; // TODO
+        this.foreignKeyColumns.forEach(column => {
+            column.primaryKey = value;
+        })
+        this._identifying = value;
     }
 }
