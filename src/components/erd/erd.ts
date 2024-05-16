@@ -105,7 +105,11 @@ export class Erd extends Viewport {
     }
 
     draw(context: CanvasRenderingContext2D) {
+        context.save();
+        context.scale(this.scale, this.scale);
+        context.translate(this.offset.x, this.offset.y);
         this.reference.forEach(child => child.draw(context))
+        context.restore();
         super.draw(context);
     }
 
@@ -174,18 +178,17 @@ export function show(canvas: HTMLCanvasElement, parent: HTMLElement, e: Erd) {
 
 function draw() {
     const context = Canvas.getSingleton().context
-    const ratio = Canvas.getSingleton().ratio
+    const resolution = Canvas.getSingleton().resolution
     const offset = Canvas.getSingleton().offset
 
     context.reset();
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.scale(ratio, ratio)
-    context.translate(offset.x, offset.y)
+    context.scale(resolution, resolution)
 
     erd.position.x = -offset.x
     erd.position.y = -offset.y
-    erd.size.width = displayWidth / ratio
-    erd.size.height = displayHeight / ratio
+    erd.size.width = displayWidth / resolution
+    erd.size.height = displayHeight / resolution
 
     erd.layout();
     erd.draw(context)
