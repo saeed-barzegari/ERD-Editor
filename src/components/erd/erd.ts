@@ -16,8 +16,9 @@ export enum ERDMode{
 }
 
 export class Erd extends Viewport {
-    reference: Reference[] = [];
-    tableCounter = 1;
+    private references: Reference[] = [];
+    private tables: Table[] = [];
+    private tableCounter = 1;
     table = new Table("");
     mode = ERDMode.Editing;
 
@@ -27,7 +28,7 @@ export class Erd extends Viewport {
         for (let i = 0; i < 2; i++) { // todo: remove
             this.addTableWithGlobalPos(i * 200, i * 100)
         }
-        this.reference.push(new Reference(<Table>this.children[0], <Table>this.children[1]));
+        this.references.push(new Reference(<Table>this.children[0], <Table>this.children[1]));
 
         this.addListener('click', () => {
             this.selected.forEach(child => {
@@ -43,7 +44,7 @@ export class Erd extends Viewport {
             if(this.mode == ERDMode.Referencing) {
                 this.children.forEach(child => {
                     if (child.isInArea(x, y)) {
-                        this.reference.push(new Reference(this.table, child as Table));
+                        this.references.push(new Reference(this.table, child as Table));
                         this.mode = ERDMode.Editing;
                     }
                 })
@@ -67,7 +68,7 @@ export class Erd extends Viewport {
             })
             if (hit) return;
 
-            this.reference.forEach(ref => {
+            this.references.forEach(ref => {
                 if (ref.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
                     this.emit('contextmenu', mousePosition, ContextMenuContent.ReferenceContextMenu)
@@ -82,6 +83,7 @@ export class Erd extends Viewport {
 
     addTable(table: Table) {
         this.addChild(table);
+        this.tables.push(table);
         this.emit('edit-table', table);
         this.table = table;
         table.addListener('click', () => {
@@ -97,18 +99,36 @@ export class Erd extends Viewport {
     }
 
     addTableWithGlobalPos(x: number, y: number) {
-        const table = new Table("table_" + this.tableCounter);
+        const tableName = this.generateUniqueTableName();
+        const table = new Table(tableName);
         this.tableCounter++;
         this.addTable(table);
         table.setGlobalPosition(x, y);
         return table;
     }
 
+    private generateUniqueTableName(){
+        let name = "table_" + this.tableCounter;
+        while (this.hasTableName(name)){
+            this.tableCounter++;
+            name = "table_" + this.tableCounter;
+        }
+        return name;
+    }
+
+    private hasTableName(name:string){
+        for (const table of this.tables) {
+            if(table.name == name)
+                return true;
+        }
+        return false;
+    }
+
     draw(context: CanvasRenderingContext2D) {
         context.save();
         context.scale(this.scale, this.scale);
         context.translate(this.offset.x, this.offset.y);
-        this.reference.forEach(child => child.draw(context))
+        this.references.forEach(child => child.draw(context))
         context.restore();
         super.draw(context);
     }
