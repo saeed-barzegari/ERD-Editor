@@ -57,7 +57,7 @@ export class Erd extends Viewport {
 
             let hit = false;
             const mousePosition = new Point(ev.offsetX, ev.offsetY);
-            const localMousePosition = this.convertToLocal(mousePosition.copy())
+            const localMousePosition = this.convertGlobalPositionToLocal(mousePosition.copy())
             this.children.forEach(child => {
                 if (child.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
@@ -99,8 +99,8 @@ export class Erd extends Viewport {
     addTableWithGlobalPos(x: number, y: number) {
         const table = new Table("table_" + this.tableCounter);
         this.tableCounter++;
-        table.setGlobalPosition(x, y);
         this.addTable(table);
+        table.setGlobalPosition(x, y);
         return table;
     }
 
@@ -179,14 +179,11 @@ export function show(canvas: HTMLCanvasElement, parent: HTMLElement, e: Erd) {
 function draw() {
     const context = Canvas.getSingleton().context
     const resolution = Canvas.getSingleton().resolution
-    const offset = Canvas.getSingleton().offset
 
     context.reset();
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.scale(resolution, resolution)
 
-    erd.position.x = -offset.x
-    erd.position.y = -offset.y
     erd.size.width = displayWidth / resolution
     erd.size.height = displayHeight / resolution
 

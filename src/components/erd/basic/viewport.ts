@@ -2,7 +2,6 @@ import {View} from "./view";
 import {Element} from "./element";
 import {isSelectable, Selectable} from "@/components/erd/basic/selectable";
 import {Table} from "@/components/erd/table";
-import {Point} from "@/components/erd/basic/point";
 
 enum MouseAction {
     Select,
@@ -12,16 +11,12 @@ enum MouseAction {
 export class Viewport extends View {
     mouseAction: MouseAction;
     selected: Selectable[];
-    protected _scale: number;
-    private _offset: Point;
 
     constructor(children: Element[] = []) {
         super(children);
         this.selected = [];
         this.mouseAction = MouseAction.Panning;
         this.mouseHandler();
-        this._scale = 2;
-        this._offset = new Point(0, 0);
     }
 
     layout() {
@@ -50,8 +45,10 @@ export class Viewport extends View {
         let startX: number, startY: number;
         const mouseMoveListener = (x: number, y: number) => {
             if (this.mouseAction == MouseAction.Panning) {
-                const changeX = (x - startX);
-                const changeY = (y - startY);
+                const changeX = (x - startX)/this.scale;
+                const changeY = (y - startY)/this.scale;
+                startX = x;
+                startY = y;
 
                 this.offset.add(changeX, changeY);
             } else if (this.mouseAction == MouseAction.Select) { // todo: implement
@@ -65,7 +62,7 @@ export class Viewport extends View {
         this.addListener('mousedown', (x: number, y: number) => {
             let hit = false;
             this.children.forEach(child =>{
-                if(child.isInArea(x, y))
+                if(child.isInArea(x/this.scale - this.offset.x, y/this.scale - this.offset.y))
                     hit = true
             })
             if(hit) return;
@@ -94,33 +91,6 @@ export class Viewport extends View {
 
     getFirstSelected() {
         return this.selected.at(0) as Table;
-    }
-
-    get scale(): number {
-        return this._scale;
-    }
-
-    set scale(value: number) {
-        this._scale = value;
-    }
-
-    get offset(): Point {
-        return this._offset;
-    }
-
-    set offset(value: Point) {
-        this._offset = value;
-    }
-
-    mouseUp(x: number, y: number) {
-        super.mouseUp(x/this.scale - this.offset.x, y/this.scale - this.offset.y);
-    }
-    mouseDown(x: number, y: number): boolean {
-        return super.mouseDown(x/this.scale - this.offset.x, y/this.scale - this.offset.y);
-    }
-
-    mouseMove(x: number, y: number, overlay = false): boolean {
-        return super.mouseMove(x/this.scale - this.offset.x, y/this.scale - this.offset.y, overlay);
     }
 
     click(x: number, y: number): boolean {

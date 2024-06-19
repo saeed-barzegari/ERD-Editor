@@ -4,6 +4,7 @@ import {Point} from "./point";
 import {BorderRadius} from "./border-radius";
 import {EventEmitter} from "events";
 import {Canvas} from "@/components/erd/basic/canvas";
+import {View} from "@/components/erd/basic/view";
 
 export abstract class Element extends EventEmitter {
     parent: Element | null;
@@ -118,11 +119,8 @@ export abstract class Element extends EventEmitter {
     }
 
     mouseDown(x: number, y: number) {
-        if (this.isInArea(x, y)) {
+        if (this.isInArea(x, y))
             this.emit('mousedown', x, y);
-            return true;
-        }
-        return false;
     }
 
     mouseUP(x: number, y: number) {
@@ -147,6 +145,10 @@ export abstract class Element extends EventEmitter {
 
     mouseMove(x: number, y: number, overlay = false) {
         this.emit('mousemove', x, y);
+        return this.hoverCheck(x, y, overlay);
+    }
+
+    protected hoverCheck(x: number, y: number, overlay = false){
         if (overlay) {
             if (this.isHovered) {
                 this.emit('leaver');
@@ -303,23 +305,33 @@ export abstract class Element extends EventEmitter {
         return this;
     }
 
-    convertToGlobal(pos:Point){
-        const canvas = Canvas.getSingleton();
-        return pos.addPoint(canvas.offset).mul(canvas.scale);
-    }
-
-    convertToLocal(pos:Point){
-        const canvas = Canvas.getSingleton();
-        return pos.div(canvas.scale).subPoint(canvas.offset);
-    }
-
     getGlobalPosition() {
-        return this.convertToGlobal(this.position.copy());
+        let parent = this.parent;
+        let pos = this.position.copy()
+        while(parent !== null){
+            if (!(parent instanceof View)) continue;
+            pos = (parent as View).convertLocalPositionToGlobal(pos);
+            parent = parent.parent;
+        }
+        return pos;
     }
 
     setGlobalPosition(x: number, y: number) {
-        const canvas = Canvas.getSingleton();
-        this.position.set(x, y).div(canvas.scale).subPoint(canvas.offset);
+        let parent = this.parent;
+        const viewStack:View[] = [];
+        let pos = new Point(x, y);
+        while(parent !== null) {
+            if (!(parent instanceof View)) continue;
+            viewStack.push(parent);
+            parent = parent.parent;
+        }
+        while (viewStack.length != 0){
+            const view = viewStack.pop();
+            if (view == null) continue;
+            pos = view.convertGlobalPositionToLocal(pos);
+            console.log("convert")
+        }
+        this.position.set(pos.x, pos.y);
     }
 
     getInnerWidth(){

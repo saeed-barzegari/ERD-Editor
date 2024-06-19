@@ -58,6 +58,7 @@ export default defineComponent({
       const xRightClick = rectMenu.left - rectCanvas.left;
       const yRightClick = rectMenu.top - rectCanvas.top;
       this.erd.addTableWithGlobalPos(xRightClick, yRightClick);
+      this.showTableEditor(xRightClick, yRightClick);
     },
     changeTableName(ev: FocusEvent) {
       if (!ev.target) return;
