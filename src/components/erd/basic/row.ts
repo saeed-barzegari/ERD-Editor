@@ -21,6 +21,8 @@ export class Row extends View {
         let sumWidth = 0;
         this.children.forEach(child => {
             child.layout();
+            if(!(child instanceof Element))
+                return
             maxHeight = Math.max(maxHeight, child.getHeight());
             sumWidth += child.getWidth();
         });
@@ -33,6 +35,8 @@ export class Row extends View {
         let leftChildX = this.position.x + this.getLeftPadding();
         let rightChildX = this.position.x + this.size.width - this.getRightPadding();
         this.children.forEach((child, index) => {
+            if(!(child instanceof Element))
+                return
             if(this.justifyContent == JustifyContent.Left || this.justifyContent == JustifyContent.SpaceBetween && index < this.children.length / 2) {
                 child.position.x = leftChildX + child.getLeftMargin() + child.getBorderWidth();
                 leftChildX += child.getWidth();

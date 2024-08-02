@@ -135,4 +135,13 @@ export class Table extends Column implements Selectable {
     get primaryKeyColumns(): TableColumn[] {
         return this._primaryKeyColumns;
     }
+
+    removerReference(reference: Reference){
+        const index = this._references.indexOf(reference);
+        this._references.remove(index);
+    }
+
+    removeAllReference(){
+        this._references = [];
+    }
 }

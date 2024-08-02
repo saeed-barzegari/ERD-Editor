@@ -60,6 +60,9 @@ export default defineComponent({
       this.erd.addTableWithGlobalPos(xRightClick, yRightClick);
       this.showTableEditor(xRightClick, yRightClick);
     },
+    removeTable() {
+      this.erd.removeTable(this.table as Table);
+    },
     changeTableName(ev: FocusEvent) {
       if (!ev.target) return;
       const target = ev.target as HTMLInputElement
@@ -135,6 +138,7 @@ export default defineComponent({
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.TableContextMenu">
         <li @click="erd.setReferencingMode()">add Relationship</li>
+        <li @click="removeTable">remove</li>
         <li>sort</li>
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.ReferenceContextMenu">

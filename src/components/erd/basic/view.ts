@@ -1,9 +1,9 @@
 import {Element} from "@/components/erd/basic/element";
-import {Size} from "@/components/erd/basic/size";
 import {Point} from "@/components/erd/basic/point";
+import {Drawable} from "@/components/erd/basic/drawable";
 
 export abstract class View extends Element {
-    children: Element[];
+    children: Drawable[];
     clip: boolean;
     protected _scale: number;
     private _offset: Point;
@@ -13,7 +13,7 @@ export abstract class View extends Element {
         this.children = children;
         this.clip = false;
         this.children.forEach(child => {
-            child.setParent(this)
+            child.parent = this;
         })
         this._scale = 1;
         this._offset = new Point(0, 0);
@@ -41,7 +41,7 @@ export abstract class View extends Element {
 
     mouseUp(x: number, y: number) {
         super.mouseUP(x, y);
-        this.children.forEach(child => child.mouseUP(x/this.scale - this.offset.x, y/this.scale - this.offset.y))
+        this.children.forEach(child => child.mouseUp(x/this.scale - this.offset.x, y/this.scale - this.offset.y))
     }
 
     wheel(x:number, y:number, deltaY:number) {
@@ -77,6 +77,11 @@ export abstract class View extends Element {
         this.children.push(element);
         element.parent = this;
         return this;
+    }
+
+    removeChild(element: Element){
+        const index = this.children.indexOf(element);
+        this.children.remove(index);
     }
 
     convertLocalPositionToGlobal(pos:Point){

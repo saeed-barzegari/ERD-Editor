@@ -1,12 +1,16 @@
 import {Point} from "@/components/erd/basic/point";
+import {Drawable} from "@/components/erd/basic/drawable";
+import {View} from "@/components/erd/basic/view";
 
-export class Path {
+export class Path implements Drawable{
+    parent: View | null;
     private _positions: Point[];
     private _color:string;
 
     constructor(color = "white") {
         this._positions = [];
         this._color = color;
+        this.parent = null;
     }
 
     setColor(color:string){
@@ -64,6 +68,34 @@ export class Path {
             }
         }
 
+        return false;
+    }
+
+    layout() {
+        return;
+    }
+
+    mouseDown(x: number, y: number): void {
+        return
+    }
+
+    mouseMove(x: number, y: number, overlay: boolean): boolean {
+        return false;
+    }
+
+    mouseUp(x: number, y: number): void {
+        return
+    }
+
+    wheel(x: number, y: number, deltaY: number): void {
+        return
+    }
+
+    click(x: number, y: number): boolean {
+        return false;
+    }
+
+    dblClick(x: number, y: number): boolean {
         return false;
     }
 }

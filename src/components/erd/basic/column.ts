@@ -13,6 +13,8 @@ export class Column extends View {
         let maxWidth = Number.MIN_SAFE_INTEGER;
         let sumHeight = 0;
         this.children.forEach(child => {
+            if(!(child instanceof Element))
+                return
             child.layout();
             maxWidth = Math.max(child.getWidth(), maxWidth);
             sumHeight += child.getHeight();
@@ -21,6 +23,8 @@ export class Column extends View {
         this.size.width = maxWidth + this.getHorizontalPadding();
         if (this.contentWidthFitToParent)
             this.children.forEach(child => {
+                if(!(child instanceof Element))
+                    return
                 child.widthFitToParent();
             })
     }
@@ -29,6 +33,8 @@ export class Column extends View {
         super.draw(context);
         let childY = this.position.y + this.getTopPadding();
         this.children.forEach(child => {
+            if(!(child instanceof Element))
+                return
             child.position.y = childY + child.getTopMargin() + child.getBorderWidth();
             child.position.x = this.position.x + this.getLeftPadding() + child.getLeftMargin() + child.getBorderWidth();
             childY += child.getHeight();
@@ -55,6 +61,8 @@ export class Column extends View {
         super.widthFitToParent();
         if (this.contentWidthFitToParent)
             this.children.forEach(child => {
+                if(!(child instanceof Element))
+                    return
                 child.widthFitToParent();
             })
     }

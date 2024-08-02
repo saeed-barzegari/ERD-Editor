@@ -16,7 +16,7 @@ export enum ERDMode{
 }
 
 export class Erd extends Viewport {
-    private references: Reference[] = [];
+    private references: Reference[] = [];//todo removed
     private tables: Table[] = [];
     private tableCounter = 1;
     table = new Table("");
@@ -122,6 +122,12 @@ export class Erd extends Viewport {
                 return true;
         }
         return false;
+    }
+
+    removeTable(table:Table){
+        const index = this.tables.indexOf(table);
+        this.tables.remove(index);
+        this.removeChild(table);
     }
 
     draw(context: CanvasRenderingContext2D) {

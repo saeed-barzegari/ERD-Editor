@@ -3,11 +3,11 @@ import {Size} from "./size";
 import {Point} from "./point";
 import {BorderRadius} from "./border-radius";
 import {EventEmitter} from "events";
-import {Canvas} from "@/components/erd/basic/canvas";
 import {View} from "@/components/erd/basic/view";
+import {Drawable} from "@/components/erd/basic/drawable";
 
-export abstract class Element extends EventEmitter {
-    parent: Element | null;
+export abstract class Element extends EventEmitter implements Drawable{
+    parent: View | null;
     protected padding: BoundingBox;
     protected margin: BoundingBox;
     size: Size;
@@ -264,10 +264,6 @@ export abstract class Element extends EventEmitter {
         return this.borderWidth
     }
 
-    setParent(element: Element) {
-        this.parent = element;
-    }
-
     getCenterX() {
         return this.position.x + this.size.width / 2
     }
@@ -309,8 +305,7 @@ export abstract class Element extends EventEmitter {
         let parent = this.parent;
         let pos = this.position.copy()
         while(parent !== null){
-            if (!(parent instanceof View)) continue;
-            pos = (parent as View).convertLocalPositionToGlobal(pos);
+            pos = parent.convertLocalPositionToGlobal(pos);
             parent = parent.parent;
         }
         return pos;
@@ -321,7 +316,6 @@ export abstract class Element extends EventEmitter {
         const viewStack:View[] = [];
         let pos = new Point(x, y);
         while(parent !== null) {
-            if (!(parent instanceof View)) continue;
             viewStack.push(parent);
             parent = parent.parent;
         }
@@ -340,5 +334,13 @@ export abstract class Element extends EventEmitter {
 
     getInnerHeight(){
         return this.size.height - this.getVerticalPadding();
+    }
+
+    mouseUp(x: number, y: number) {
+        return
+    }
+
+    wheel(x: number, y: number, deltaY: number) {
+        return
     }
 }
