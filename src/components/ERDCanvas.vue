@@ -87,7 +87,7 @@ export default defineComponent({
       if (columnList != list){
         this.table.removeColumn(column);
         column.primaryKey = !column.primaryKey;
-        this.table.addColumn(column, index);
+        this.table.addColumnWithColumn(column, index);
       } else {
         if(columnList == 0)
           this.table.primaryKeyColumns.move(columnIndex, index);
@@ -148,27 +148,37 @@ export default defineComponent({
     </div>
 
     <div id="table-editor" ref="tableEditor" v-show="!tableEditorIsHidden">
-      <div>
-        <input @focusout="changeTableName" ref="tableName" v-model="table.name">
+      <div class="header">
+        <input class="table-name" @focusout="changeTableName" ref="tableName" v-model="table.name">
       </div>
       <div class="columns">
         <div class="pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 0)" ref="primaryKeyZone">
           <div class="column" v-for="(column, index) in table.primaryKeyColumns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
-            <input v-model="column.name">
+            <input v-model="column.name" placeholder="<Column Name>">
+            <input v-model="column.type" placeholder="<Data Type>">
           </div>
-          <input
-              @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn(new TableColumn((ev.target as HTMLInputElement).value).setPrimaryKey(true)); (ev.target as HTMLInputElement).value ='';}">
+          <div class="add_column">
+            <input placeholder="<Column Name>"
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+            <input placeholder="<Data Type>"
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+          </div>
         </div>
         <hr style="width: 100%">
         <div class="non-pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 1)" ref="nonPrimaryKeyZone">
           <div class="column" v-for="(column, index) in table.columns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
-            <input v-model="column.name">
+            <input v-model="column.name" placeholder="<Column Name>">
+            <input v-model="column.type" placeholder="<Data Type>">
           </div>
-          <input
-              @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn(new TableColumn((ev.target as HTMLInputElement).value)); (ev.target as HTMLInputElement).value ='';}">
-        </div>
+          <div class="add_column">
+            <input placeholder="<Column Name>"
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+            <input placeholder="<Data Type>"
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+          </div>
+          </div>
         </div>
     </div>
   </div>
@@ -203,12 +213,13 @@ export default defineComponent({
   position: absolute;
   top: 0;
   left: 0;
+  background: #1c1e24;
 }
 
 #table-editor .columns {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 4px;
   background: #2d2f38;
   border: #828691;
 }
@@ -225,8 +236,16 @@ export default defineComponent({
 
 #table-editor .columns input {
   padding: 4px;
-  margin: 2px 0;
-  border: none;
+  margin: 2px;
+  background: #25272d;
+  border: 1px solid #828691;
+  color: #b5b9be;
+  font-size: 0.6em;
+}
+
+#table-editor .columns input:focus {
+  border: 1px solid #c3c7d0;
+  outline: none;
 }
 
 .column {
@@ -238,5 +257,24 @@ export default defineComponent({
 .column .drag {
   align-content: center;
   padding: 5px;
+}
+
+#table-editor .header {
+  margin: 4px 17px 4px 19px;
+}
+
+.table-name{
+  width: 100%;
+  background: #1c1e24;
+  border: 1px solid #828691;
+  padding: 4px;
+  color: #b5b9be;
+}
+
+.add_column {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-left: 13px;
 }
 </style>
