@@ -6,6 +6,8 @@ export class TableColumn extends Row {
     private _name = "";
     private _primaryKey = false;
     private _foreignKey = false;
+    private _type = ""
+    private _nullable = false;
 
     constructor(name: string) {
         super();
@@ -56,5 +58,21 @@ export class TableColumn extends Row {
     setPrimaryKey(primaryKey: boolean) {
         this.primaryKey = primaryKey;
         return this;
+    }
+
+    get type(): string {
+        return this._type;
+    }
+
+    set type(value: string) {
+        this._type = value;
+    }
+
+    get nullable(): boolean {
+        return this._nullable;
+    }
+
+    set nullable(value: boolean) {
+        this._nullable = value;
     }
 }

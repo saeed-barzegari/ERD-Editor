@@ -1,6 +1,5 @@
 import {View} from "./view";
 import {Element} from "./element";
-import {Canvas} from "@/components/erd/basic/canvas";
 import {isSelectable, Selectable} from "@/components/erd/basic/selectable";
 import {Table} from "@/components/erd/table";
 
@@ -27,14 +26,18 @@ export class Viewport extends View {
 
     draw(context: CanvasRenderingContext2D) {
         super.draw(context);
+        context.save()
         if (this.clip) {
             context.save();
             context.clip();
         }
+        context.scale(this.scale, this.scale)
+        context.translate(this.offset.x, this.offset.y)
         this.children.forEach(child => child.draw(context))
         if (this.clip) {
             context.restore();
         }
+        context.restore();
     }
 
     mouseHandler() {
@@ -42,10 +45,12 @@ export class Viewport extends View {
         let startX: number, startY: number;
         const mouseMoveListener = (x: number, y: number) => {
             if (this.mouseAction == MouseAction.Panning) {
-                const changeX = (x - startX);
-                const changeY = (y - startY);
+                const changeX = (x - startX)/this.scale;
+                const changeY = (y - startY)/this.scale;
+                startX = x;
+                startY = y;
 
-                Canvas.getSingleton().offset.add(changeX, changeY);
+                this.offset.add(changeX, changeY);
             } else if (this.mouseAction == MouseAction.Select) { // todo: implement
                 this.selected = []
                 this.children.forEach(child => {
@@ -57,7 +62,7 @@ export class Viewport extends View {
         this.addListener('mousedown', (x: number, y: number) => {
             let hit = false;
             this.children.forEach(child =>{
-                if(child.isInArea(x, y))
+                if(child.isInArea(x/this.scale - this.offset.x, y/this.scale - this.offset.y))
                     hit = true
             })
             if(hit) return;
@@ -70,8 +75,7 @@ export class Viewport extends View {
 
         //Zoom
         this.addListener('wheel', (x, y, deltaY) => {
-            const canvas = Canvas.getSingleton();
-            canvas.scale = Math.max(0.25, Math.min(4, canvas.scale + deltaY / 400));
+            this.scale = Math.max(0.25, Math.min(4, this.scale + deltaY / 400));
         })
     }
 
@@ -87,5 +91,9 @@ export class Viewport extends View {
 
     getFirstSelected() {
         return this.selected.at(0) as Table;
+    }
+
+    click(x: number, y: number): boolean {
+        return super.click(x/this.scale - this.offset.x, y/this.scale - this.offset.y);
     }
 }

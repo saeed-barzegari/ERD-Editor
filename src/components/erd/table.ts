@@ -61,7 +61,16 @@ export class Table extends Column implements Selectable {
         })
     }
 
-    addColumn(column: TableColumn, index = -1) {
+    addColumn(columnArgs:{name?:string, type?:string, primaryKey?:boolean}, index = -1){
+        const columnName: string = columnArgs.name || this.generateUniqueColumnName();
+        const column = new TableColumn(columnName);
+        column.type = columnArgs.type || "";
+        column.primaryKey = columnArgs.primaryKey || false;
+        this.addColumnWithColumn(column, index);
+        return column;
+    }
+
+    addColumnWithColumn(column: TableColumn, index = -1) {
         if (column.primaryKey) {
             if (index >= 0)
                 this._primaryKeyColumns.splice(index, 0, column);
@@ -134,5 +143,39 @@ export class Table extends Column implements Selectable {
 
     get primaryKeyColumns(): TableColumn[] {
         return this._primaryKeyColumns;
+    }
+
+    removerReference(reference: Reference){
+        const index = this._references.indexOf(reference);
+        this._references.remove(index);
+    }
+
+    removeAllReference(){
+        this._references = [];
+    }
+
+    private generateUniqueColumnName() {
+        const counter = this.primaryKeyColumns.length + this.columns.length;
+        let columnName = "col_" + counter;
+        while(this.isColumnWithName(columnName)){
+            columnName = columnName + "_1"
+        }
+        return columnName;
+    }
+
+    isColumnWithName(name: string){
+        return this.getColumnWithName(name) != null;
+    }
+
+    getColumnWithName(name: string){
+        for (const column of this.columns){
+            if(column.name == name)
+                return column;
+        }
+        for (const column of this.primaryKeyColumns){
+            if (column.name == name)
+                return column
+        }
+        return null;
     }
 }

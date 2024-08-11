@@ -1,8 +1,10 @@
 import {Point} from "@/components/erd/basic/point";
 import {EventEmitter} from "events";
+import {Drawable} from "@/components/erd/basic/drawable";
+import {View} from "@/components/erd/basic/view";
 
-export class Path extends EventEmitter {
-
+export class Path extends EventEmitter implements Drawable{
+    parent: View | null;
     private _positions: Point[];
     private _color:string;
     private _lineDash:number[];
@@ -11,6 +13,7 @@ export class Path extends EventEmitter {
         super();
         this._positions = [];
         this._color = color;
+        this.parent = null;
         this._lineDash = [];
     }
 
@@ -82,6 +85,34 @@ export class Path extends EventEmitter {
             }
         }
 
+        return false;
+    }
+
+    layout() {
+        return;
+    }
+
+    mouseDown(x: number, y: number): void {
+        return
+    }
+
+    mouseMove(x: number, y: number, overlay: boolean): boolean {
+        return false;
+    }
+
+    mouseUp(x: number, y: number): void {
+        return
+    }
+
+    wheel(x: number, y: number, deltaY: number): void {
+        return
+    }
+
+    click(x: number, y: number): boolean {
+        return false;
+    }
+
+    dblClick(x: number, y: number): boolean {
         return false;
     }
 }
