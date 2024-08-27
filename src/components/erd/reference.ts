@@ -50,7 +50,7 @@ export class Reference extends Path {
         const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(referenceColumn.name);
         this.foreignKeyColumns.push(fkColumn);
         fkColumn.foreignKey = true;
-        this.fromTable.addColumn(fkColumn);
+        this.fromTable.addColumnWithColumn(fkColumn);
         referenceColumn.addListener("changeName", name => fkColumn.name = name); // TODO: if name is not auto generate this not listening
         referenceColumn.addListener("changePrimaryKey", () => {
             this.fromTable.removeColumn(fkColumn);
