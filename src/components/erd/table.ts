@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import {Column} from "./basic/column";
 import {Text} from "@/components/erd/basic/text";
 import {TableColumn} from "@/components/erd/table-column";
@@ -6,17 +7,18 @@ import {Selectable} from "@/components/erd/basic/selectable";
 import {HorizontalLine} from "@/components/erd/basic/horizontal-line";
 import {Reference} from "@/components/erd/reference";
 import "./utils"
+import {Erd} from "@/components/erd/erd";
 
 export class Table extends Column implements Selectable {
+    public readonly id: string;
     isSelected: State<boolean> = new State<boolean>(false);
     private _name: State<string> = new State<string>("");
     private _primaryKeyColumns: TableColumn[] = [];
     private _columns: TableColumn[] = [];
-    private _references: Reference[] = [];
 
-    constructor(name: string) {
+    constructor(id = uuid()) {
         super();
-        this.name = name;
+        this.id = id;
 
         const databaseName = new Text(this._name.value).setMargin(2, 2, 2, 2).setTextColor("white")
         this._name.addListener('change', newName => databaseName.setText(newName))
@@ -137,21 +139,8 @@ export class Table extends Column implements Selectable {
         this._name.value = value;
     }
 
-    addReference(parent: Table) {
-        this._references.push(new Reference(parent, this))
-    }
-
     get primaryKeyColumns(): TableColumn[] {
         return this._primaryKeyColumns;
-    }
-
-    removerReference(reference: Reference){
-        const index = this._references.indexOf(reference);
-        this._references.remove(index);
-    }
-
-    removeAllReference(){
-        this._references = [];
     }
 
     private generateUniqueColumnName() {
@@ -177,5 +166,66 @@ export class Table extends Column implements Selectable {
                 return column
         }
         return null;
+    }
+
+    exportDatabaseModel() {
+        const columnsModel = [];
+        const primaryKeyColumnsModel = [];
+
+        for (const column of this.columns) {
+            columnsModel.push(column.exportDatabaseModel())
+        }
+
+        for (const column of this.primaryKeyColumns) {
+            primaryKeyColumnsModel.push(column.exportDatabaseModel())
+        }
+
+        return {
+            id: this.id,
+            name: this.name,
+            columns: columnsModel,
+            pkColumns: primaryKeyColumnsModel,
+        } as TableDatabaseModel
+    }
+
+    importDatabaseModel(tableDatabaseModel: TableDatabaseModel) {
+        this.name = tableDatabaseModel["name"];
+
+        for (const columnDatabaseModel of tableDatabaseModel.columns) {
+            const column = new TableColumn("");
+            column.importDatabaseModel(columnDatabaseModel);
+            this.addColumnWithColumn(column);
+        }
+
+        for (const columnDatabaseModel of tableDatabaseModel.pkColumns) {
+            const column = new TableColumn("");
+            column.importDatabaseModel(columnDatabaseModel);
+            this.addColumnWithColumn(column);
+        }
+    }
+
+    exportDiagramModel() {
+        return {
+            id: this.id,
+            x: this.position.x,
+            y: this.position.y
+        }
+    }
+
+    importDiagramModel(tableDiagramModel: TableDiagramModel) {
+        this.position.set(tableDiagramModel.x, tableDiagramModel.y);
+    }
+
+    getColumnById(id: string) {
+        for (const column of this.columns) {
+            if (column.id == id)
+                return column
+        }
+
+        for (const column of this.primaryKeyColumns) {
+            if (column.id == id)
+                return column
+        }
+        return null
     }
 }

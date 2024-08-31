@@ -2,6 +2,7 @@ import {Path} from "@/components/erd/basic/path";
 import {Table} from "@/components/erd/table";
 import {Point} from "@/components/erd/basic/point";
 import {TableColumn} from "@/components/erd/table-column";
+import {Erd} from "@/components/erd/erd";
 
 enum PointDirection {
     Top,
@@ -22,7 +23,7 @@ export class Reference extends Path {
     _identifying = false;
     static notation: ReferenceNotation = ReferenceNotation.IDEF1X;
 
-    constructor(fromTable: Table, toTable: Table) {
+    constructor(fromTable: Table, toTable: Table, isImportingProject = false) {
         super();
         this.fromTable = fromTable;
         this.toTable = toTable;
@@ -37,6 +38,7 @@ export class Reference extends Path {
         this.lineDash = lineDash;
         this.addListener("changeIdentifying", value => this.lineDash = value? [] : lineDash)
 
+        if(isImportingProject) return;
         for(const column of this.toTable.primaryKeyColumns){
             this.registerColumnToForeignKey(column)
         }
@@ -49,8 +51,9 @@ export class Reference extends Path {
     private registerColumnToForeignKey(referenceColumn:TableColumn, foreignKeyColumn?:TableColumn){
         const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(referenceColumn.name);
         this.foreignKeyColumns.push(fkColumn);
-        fkColumn.foreignKey = true;
-        this.fromTable.addColumnWithColumn(fkColumn);
+        fkColumn.foreignKey = referenceColumn;
+        if(!foreignKeyColumn)
+            this.fromTable.addColumnWithColumn(fkColumn);
         referenceColumn.addListener("changeName", name => fkColumn.name = name); // TODO: if name is not auto generate this not listening
         referenceColumn.addListener("changePrimaryKey", () => {
             this.fromTable.removeColumn(fkColumn);
@@ -212,5 +215,35 @@ export class Reference extends Path {
             column.primaryKey = value;
         })
         this._identifying = value;
+    }
+
+    exportDatabaseModel() {
+        const foreignKeysDatabaseModel:ForeignKeyDatabaseModel[] = [];
+        for (const foreignKeyColumn of this.foreignKeyColumns) {
+            foreignKeysDatabaseModel.push({
+                pkColumnId: foreignKeyColumn.referenceForeignKeyColumn?.id,
+                fkColumnId: foreignKeyColumn.id
+            } as ForeignKeyDatabaseModel)
+        }
+        return {
+            fkColumns: foreignKeysDatabaseModel,
+            toTableId: this.toTable.id,
+            fromTableId: this.fromTable.id,
+        } as ReferenceDatabaseModel
+    }
+
+    importDatabaseModel(referenceDatabaseModel: ReferenceDatabaseModel) {
+        for (const fkColumnDatabaseModel of referenceDatabaseModel.fkColumns) {
+            const pkColumn = this.toTable.getColumnById(fkColumnDatabaseModel.pkColumnId);
+            const fkColumn = this.fromTable.getColumnById(fkColumnDatabaseModel.fkColumnId);
+            console.log("pre import fk")
+            console.log(pkColumn);
+            console.log(fkColumn)
+            if (!pkColumn || !fkColumn)
+                continue;
+            console.log("import fk")
+            fkColumn.foreignKey = pkColumn;
+            this.foreignKeyColumns.push(fkColumn);
+        }
     }
 }

@@ -16,19 +16,14 @@ export enum ERDMode{
 }
 
 export class Erd extends Viewport {
-    private references: Reference[] = [];//todo removed
+    private references: Reference[] = [];
     private tables: Table[] = [];
     private tableCounter = 1;
-    table = new Table("");
+    table = new Table();
     mode = ERDMode.Editing;
 
     constructor() {
         super();
-
-        for (let i = 0; i < 2; i++) { // todo: remove
-            this.addTableWithGlobalPos(i * 200, i * 100)
-        }
-        this.references.push(new Reference(<Table>this.children[0], <Table>this.children[1]));
 
         this.addListener('click', () => {
             this.selected.forEach(child => {
@@ -42,9 +37,9 @@ export class Erd extends Viewport {
         this.addListener('mousedown', (x:number, y:number)=>{
             console.log('mouse down ref')
             if(this.mode == ERDMode.Referencing) {
-                this.children.forEach(child => {
-                    if (child.isInArea(x, y)) {
-                        this.references.push(new Reference(this.table, child as Table));
+                this.tables.forEach(table => {
+                    if (table.isInArea(x, y)) {
+                        this.addReferenceWithReference(new Reference(this.table, table))
                         this.mode = ERDMode.Editing;
                     }
                 })
@@ -59,7 +54,7 @@ export class Erd extends Viewport {
             let hit = false;
             const mousePosition = new Point(ev.offsetX, ev.offsetY);
             const localMousePosition = this.convertGlobalPositionToLocal(mousePosition.copy())
-            this.children.forEach(child => {
+            this.tables.forEach(child => {
                 if (child.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
                     this.table = child as Table;
@@ -100,7 +95,8 @@ export class Erd extends Viewport {
 
     addTableWithGlobalPos(x: number, y: number) {
         const tableName = this.generateUniqueTableName();
-        const table = new Table(tableName);
+        const table = new Table();
+        table.name = tableName;
         this.tableCounter++;
         this.addTable(table);
         table.setGlobalPosition(x, y);
@@ -130,15 +126,6 @@ export class Erd extends Viewport {
         this.removeChild(table);
     }
 
-    draw(context: CanvasRenderingContext2D) {
-        context.save();
-        context.scale(this.scale, this.scale);
-        context.translate(this.offset.x, this.offset.y);
-        this.references.forEach(child => child.draw(context))
-        context.restore();
-        super.draw(context);
-    }
-
     setReferencingMode(){
         this.mode = ERDMode.Referencing;
     }
@@ -153,6 +140,86 @@ export class Erd extends Viewport {
 
     isEditingMode(){
         return this.mode == ERDMode.Referencing;
+    }
+
+    getTableById(id: string) {
+        for (const table of this.tables) {
+            if (table.id == id)
+                return table
+        }
+        return null
+    }
+
+    exportProject() {
+        return {
+            databaseModel: this.exportDatabaseModel(),
+            diagramModel: this.exportDiagramModel(),
+        } as Project;
+    }
+
+    exportDatabaseModel() {
+        const tablesModel: TableDatabaseModel[] = []
+        const referencesModel: ReferenceDatabaseModel[] = []
+
+        for (const table of this.tables) {
+            tablesModel.push(table.exportDatabaseModel());
+        }
+
+        for (const reference of this.references) {
+            referencesModel.push(reference.exportDatabaseModel())
+        }
+
+        return {
+            tables: tablesModel,
+            references: referencesModel,
+        } as DatabaseModel;
+    }
+
+    exportDiagramModel() {
+        const tablesDiagramModel: TableDiagramModel[] = [];
+        for (const table of this.tables) {
+            tablesDiagramModel.push(table.exportDiagramModel())
+        }
+        return {
+            diagramTables: tablesDiagramModel,
+        } as DiagramModel;
+    }
+
+    importDiagramModel(diagramModel: DiagramModel) {
+        for (const tableDiagramModel of diagramModel.diagramTables) {
+            const table = new Table(tableDiagramModel.id);
+            table.importDiagramModel(tableDiagramModel);
+            this.addTable(table);
+        }
+    }
+
+    importProject(project: Project) {
+        this.importDiagramModel(project.diagramModel);
+        this.importDatabaseModel(project.databaseModel);
+    }
+
+    importDatabaseModel(databaseModel: DatabaseModel) {
+        for (const tableDatabaseModel of databaseModel.tables) {
+            const table = this.getTableById(tableDatabaseModel.id);
+            if (!table) continue
+            table.importDatabaseModel(tableDatabaseModel);
+        }
+
+        for (const referenceDatabaseModel of databaseModel.references) {
+            const toTable = this.getTableById(referenceDatabaseModel.toTableId);
+            const fromTable = this.getTableById(referenceDatabaseModel.fromTableId);
+            if (!toTable || !fromTable) continue;
+            const reference = new Reference(fromTable, toTable, true);
+            console.log("ref import")
+            reference.importDatabaseModel(referenceDatabaseModel);
+            this.addReferenceWithReference(reference)
+        }
+    }
+
+    private addReferenceWithReference(reference: Reference) {
+        reference.parent = this;
+        this.references.push(reference);
+        this.children.push(reference);
     }
 }
 

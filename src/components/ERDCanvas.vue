@@ -101,7 +101,7 @@ export default defineComponent({
       contextMenuIsHidden: ref(true),
       contextMenuContent: ContextMenuContent.CanvasContextMenu,
       tableEditorIsHidden: ref(true),
-      table: new Table(""),
+      table: new Table(),
       erd: new Erd(),
       canvas: Canvas.getSingleton(),
     }
