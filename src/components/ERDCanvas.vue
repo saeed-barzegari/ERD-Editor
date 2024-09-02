@@ -102,6 +102,14 @@ export default defineComponent({
     showExportCode(){
       this.code = this.erd.generateCode();
       this.exportCodeVisible = true;
+    },
+    downloadImage(filename = 'image') {
+      console.log("convert img")
+      const a = document.createElement('a');
+      a.href = this.canvas.context.canvas.toDataURL("image/jpeg");
+      a.download = `${filename}.jpeg`;
+      document.body.appendChild(a);
+      a.click();
     }
   },
   data() {

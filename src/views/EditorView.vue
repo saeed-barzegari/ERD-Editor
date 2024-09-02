@@ -1,6 +1,6 @@
 <template>
   <div class="erd">
-    <ERDTopBar @onOpenCode="showExportCode"></ERDTopBar>
+    <ERDTopBar @onOpenCode="showExportCode" @onExportImage="exportImage"></ERDTopBar>
     <div class="main">
       <ERDCanvas ref="erd"/>
     </div>
@@ -15,6 +15,10 @@ const erd = ref<ERDCanvas>();
 
 function showExportCode(){
   erd.value.showExportCode();
+}
+
+function exportImage(){
+  erd.value.downloadImage();
 }
 
 </script>

@@ -25,6 +25,7 @@ export class Erd extends Viewport {
 
     constructor() {
         super();
+        this.background = "#1c1e24";
 
         this.addListener('click', () => {
             this.selected.forEach(child => {
