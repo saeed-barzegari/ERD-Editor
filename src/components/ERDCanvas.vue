@@ -110,6 +110,9 @@ export default defineComponent({
       a.download = `${filename}.jpeg`;
       document.body.appendChild(a);
       a.click();
+    },
+    zoom(scale:number) {
+      this.erd.scale += scale;
     }
   },
   data() {

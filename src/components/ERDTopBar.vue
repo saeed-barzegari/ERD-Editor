@@ -22,7 +22,25 @@
         </svg>
       </span>
     </div>
-    <div>p</div>
+    <div>
+      <span class="icon" @click="$emit('onZoomOut')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+          <path d="M10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20.9992 21L14.9492 14.95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 10H14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="icon" @click="$emit('onZoomIn')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+          <path d="M10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20.9992 21L14.9492 14.95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 10H14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 6V14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </div>
     <div>
       <span class="save">Save</span>
     </div>
@@ -56,29 +74,32 @@
 }
 
 .icon {
-  stroke: #ffdada;
+  stroke: #d9d9d9;
   height: 24px;
   border-radius: 100%;
   padding: 4px;
-  box-shadow: 0 0 3px #828691;
   margin: 0 4px;
+  cursor: pointer;
 }
 
 .icon-red {
   stroke: #8d3736;
   background: #FF605C;
   border: 1px solid #a13d3b;
+  box-shadow: 0 0 3px #828691;
 }
 
 .icon-orange {
   stroke: #8a6626;
   background: #FFBD44;
   border: 1px solid #c08e33;
+  box-shadow: 0 0 3px #828691;
 }
 
 .icon-green {
   stroke: #016226;
   background: #00CA4E;
   border: 1px solid #02a441;
+  box-shadow: 0 0 3px #828691;
 }
 </style>
