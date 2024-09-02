@@ -3,6 +3,7 @@ import {Viewport} from "@/components/erd/basic/viewport";
 import {Table} from "@/components/erd/table";
 import {Reference} from "@/components/erd/reference";
 import {Point} from "@/components/erd/basic/point";
+import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
 
 export enum ContextMenuContent {
     TableContextMenu,
@@ -16,8 +17,8 @@ export enum ERDMode{
 }
 
 export class Erd extends Viewport {
-    private references: Reference[] = [];
-    private tables: Table[] = [];
+    references: Reference[] = [];
+    tables: Table[] = [];
     private tableCounter = 1;
     table = new Table();
     mode = ERDMode.Editing;
@@ -29,6 +30,7 @@ export class Erd extends Viewport {
             this.selected.forEach(child => {
                 child.setSelected(false);
             })
+            console.log(diagramToMySQLCode(this));
         })
     }
 
@@ -216,10 +218,32 @@ export class Erd extends Viewport {
         }
     }
 
+    getReferencesByFromTable(table: Table) {
+        const references: Reference[] = [];
+        for (const reference of this.references) {
+            if(reference.fromTable == table)
+                references.push(reference);
+        }
+        return references;
+    }
+
+    getReferencesByToTable(table: Table) {
+        const references: Reference[] = [];
+        for (const reference of this.references) {
+            if(reference.toTable == table)
+                references.push(reference);
+        }
+        return references;
+    }
+
     private addReferenceWithReference(reference: Reference) {
         reference.parent = this;
         this.references.push(reference);
         this.children.push(reference);
+    }
+
+    generateCode(){
+        return diagramToMySQLCode(this);
     }
 }
 

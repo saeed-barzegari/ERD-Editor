@@ -1,17 +1,22 @@
 <template>
   <div class="erd">
-    <ERDTopBar></ERDTopBar>
+    <ERDTopBar @onOpenCode="showExportCode"></ERDTopBar>
     <div class="main">
-      <ResizeableSidebar></ResizeableSidebar>
-      <ERDCanvas/>
-      <ResizeableSidebar></ResizeableSidebar>
+      <ERDCanvas ref="erd"/>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import ERDCanvas from "@/components/ERDCanvas.vue";
-import ResizeableSidebar from "@/components/ResizeableSidebar.vue";
 import ERDTopBar from "@/components/ERDTopBar.vue";
+import {onMounted, ref} from "vue";
+
+const erd = ref<ERDCanvas>();
+
+function showExportCode(){
+  erd.value.showExportCode();
+}
+
 </script>
 
 <style scoped>

@@ -5,8 +5,11 @@ import {defineComponent, ref} from "vue";
 import {Table} from "@/components/erd/table";
 import {Canvas} from "@/components/erd/basic/canvas";
 import {TableColumn} from "@/components/erd/table-column";
+import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
+import ExportCode from "@/components/ExportCode.vue";
 
 export default defineComponent({
+  components: {ExportCode},
   computed: {
     ContextMenuContent() {
       return ContextMenuContent
@@ -16,6 +19,7 @@ export default defineComponent({
     }
   },
   methods: {
+    diagramToMySQLCode,
     showContextMenu(x: number, y: number) {
       this.contextMenuIsHidden = false;
       const menu = this.$refs.menu as HTMLElement;
@@ -94,6 +98,10 @@ export default defineComponent({
         else
           this.table.columns.move(columnIndex, index);
       }
+    },
+    showExportCode(){
+      this.code = this.erd.generateCode();
+      this.exportCodeVisible = true;
     }
   },
   data() {
@@ -104,6 +112,8 @@ export default defineComponent({
       table: new Table(),
       erd: new Erd(),
       canvas: Canvas.getSingleton(),
+      exportCodeVisible: ref(false),
+      code: ref("")
     }
   },
   mounted() {
@@ -128,6 +138,7 @@ export default defineComponent({
 </script>
 
 <template>
+  <ExportCode v-model:visible="exportCodeVisible" v-model:code="code"/>
   <div class="canvas" ref="root">
     <canvas class="" id="myCanvas" ref="canvasElement"></canvas>
 
@@ -143,7 +154,7 @@ export default defineComponent({
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.ReferenceContextMenu">
         <li @click="addTable">Convert</li>
-        <li>sort</li>
+        <li @click="()=> {showExportCode()}">sort</li>
       </ul>
     </div>
 
