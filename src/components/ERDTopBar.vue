@@ -40,6 +40,11 @@
           <path d="M10 6V14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
+      <span class="icon" @click="$emit('onZoomFitToContent')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 32 32" fill="#d9d9d9">
+          <path d="M27.333 4c1.841 0 3.333 1.492 3.333 3.333v0 16c0 1.841-1.492 3.333-3.333 3.333v0h-21.333c-1.841 0-3.333-1.492-3.333-3.333v0-16c0-1.841 1.492-3.333 3.333-3.333v0zM27.333 5.333h-21.333c-1.105 0-2 0.895-2 2v0 16c0 1.105 0.895 2 2 2v0h21.333c1.105 0 2-0.895 2-2v0-16c0-1.105-0.895-2-2-2v0zM21.333 12v6.667h-9.333v-6.667h9.333zM20 13.333h-6.667v4h6.667v-4z"></path>
+        </svg>
+      </span>
     </div>
     <div>
       <span class="save">Save</span>

@@ -26,6 +26,9 @@ export class Erd extends Viewport {
     constructor() {
         super();
         this.background = "#1c1e24";
+        const table = this.addTableWithGlobalPos(0, 0)
+        console.log(table.getLeftX() + " " + table.getTopY())
+        this.addTableWithGlobalPos(1366, 576)
 
         this.addListener('click', () => {
             this.selected.forEach(child => {
@@ -245,6 +248,28 @@ export class Erd extends Viewport {
 
     generateCode(){
         return diagramToMySQLCode(this);
+    }
+
+    zoomFitToContent() {
+        if (this.tables.length == 0)
+            return;
+
+        let minX = Number.MAX_VALUE, minY = Number.MAX_VALUE
+        let maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
+        for (const table of this.tables) {
+            minX = Math.min(minX, table.getLeftX())
+            minY = Math.min(minY, table.getTopY())
+            maxX = Math.max(maxX, table.getRightX())
+            maxY = Math.max(maxY, table.getBottomY())
+        }
+
+
+        if (this.tables.length > 1) {
+            const widthScale = this.getWidth() / (maxX - minX);
+            const heightScale = this.getHeight() / (maxY - minY);
+            this.scale = Math.min(1, widthScale, heightScale)
+        }
+        this.offset.set(this.getWidth()/2 - ((minX + maxX) / 2) * this.scale, this.getHeight()/2 - ((minY + maxY) / 2) * this.scale)
     }
 }
 

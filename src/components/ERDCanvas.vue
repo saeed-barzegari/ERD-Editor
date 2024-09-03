@@ -113,6 +113,9 @@ export default defineComponent({
     },
     zoom(scale:number) {
       this.erd.scale += scale;
+    },
+    zoomFitToContent(){
+      this.erd.zoomFitToContent();
     }
   },
   data() {

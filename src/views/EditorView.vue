@@ -1,6 +1,12 @@
 <template>
   <div class="erd">
-    <ERDTopBar @onOpenCode="showExportCode" @onExportImage="exportImage" @onZoomIn="zoom(0.1)" @onZoomOut="zoom(-0.1)"></ERDTopBar>
+    <ERDTopBar
+        @onOpenCode="showExportCode"
+        @onExportImage="exportImage"
+        @onZoomIn="zoom(0.1)"
+        @onZoomOut="zoom(-0.1)"
+        @onZoomFitToContent="zoomFitToContent"
+    />
     <div class="main">
       <ERDCanvas ref="erd"/>
     </div>
@@ -23,6 +29,10 @@ function exportImage(){
 
 function zoom(scale:number) {
   erd.value.zoom(scale);
+}
+
+function zoomFitToContent(){
+  erd.value.zoomFitToContent();
 }
 
 </script>
