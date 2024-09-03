@@ -25,9 +25,10 @@ export abstract class View extends Element {
     }
 
     mouseDown(x: number, y: number) {
+        const [localX, localY] = this.convertGlobalPositionXYToLocal(x, y);
         if (this.isInArea(x, y))
             this.emit('mousedown', x, y);
-        this.children.forEach(child => child.mouseDown(x/this.scale - this.offset.x, y/this.scale - this.offset.y))
+        this.children.forEach(child => child.mouseDown(localX, localY))
     }
 
     mouseMove(x: number, y: number, overlay = false): boolean {
@@ -102,5 +103,11 @@ export abstract class View extends Element {
 
     get offset(): Point {
         return this._offset;
+    }
+
+    convertGlobalPositionXYToLocal(x:number, y:number){
+        const localX = x/this.scale - this.offset.x;
+        const localY = y/this.scale - this.offset.y;
+        return [localX, localY]
     }
 }

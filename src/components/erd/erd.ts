@@ -41,10 +41,10 @@ export class Erd extends Viewport {
     mouseHandler() {
         super.mouseHandler();
         this.addListener('mousedown', (x:number, y:number)=>{
-            console.log('mouse down ref')
+            const [localX, localY] = this.convertGlobalPositionXYToLocal(x, y);
             if(this.mode == ERDMode.Referencing) {
                 this.tables.forEach(table => {
-                    if (table.isInArea(x, y)) {
+                    if (table.isInArea(localX, localY)) {
                         this.addReferenceWithReference(new Reference(this.table, table))
                         this.mode = ERDMode.Editing;
                     }
@@ -77,7 +77,7 @@ export class Erd extends Viewport {
             })
             if (hit) return;
 
-            if (this.isInArea(localMousePosition.x, localMousePosition.y))
+            if (this.isInArea(mousePosition.x, mousePosition.y))
                 this.emit('contextmenu', mousePosition, ContextMenuContent.CanvasContextMenu)
         })
     }
