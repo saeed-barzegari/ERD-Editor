@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import {ref} from "vue";
 
-</script>
+const gridVisible = ref(true);
+
+function gridVisibleToggle(){
+  gridVisible.value = !gridVisible.value
+}</script>
 
 <template>
   <div class="top-bar">
@@ -43,6 +48,15 @@
       <span class="icon" @click="$emit('onZoomFitToContent')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 32 32" fill="#d9d9d9">
           <path d="M27.333 4c1.841 0 3.333 1.492 3.333 3.333v0 16c0 1.841-1.492 3.333-3.333 3.333v0h-21.333c-1.841 0-3.333-1.492-3.333-3.333v0-16c0-1.841 1.492-3.333 3.333-3.333v0zM27.333 5.333h-21.333c-1.105 0-2 0.895-2 2v0 16c0 1.105 0.895 2 2 2v0h21.333c1.105 0 2-0.895 2-2v0-16c0-1.105-0.895-2-2-2v0zM21.333 12v6.667h-9.333v-6.667h9.333zM20 13.333h-6.667v4h6.667v-4z"></path>
+        </svg>
+      </span>
+      <span :class="gridVisible.valueOf() ? 'icon toggle-icon-enable': 'icon toggle-icon-disable'" @click="() => {gridVisibleToggle(); $emit('onToggleGridDiagram', gridVisible)}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
+          <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.03 8.5H22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.03 15.5H22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.51 21.99V2.01001" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.51 21.99V2.01001" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
     </div>
@@ -106,5 +120,9 @@
   background: #00CA4E;
   border: 1px solid #02a441;
   box-shadow: 0 0 3px #828691;
+}
+
+.toggle-icon-disable {
+  stroke: #525252;
 }
 </style>

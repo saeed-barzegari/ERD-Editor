@@ -6,6 +6,7 @@
         @onZoomIn="zoom(0.1)"
         @onZoomOut="zoom(-0.1)"
         @onZoomFitToContent="zoomFitToContent"
+        @onToggleGridDiagram="gridDiagramVisible"
     />
     <div class="main">
       <ERDCanvas ref="erd"/>
@@ -17,22 +18,26 @@ import ERDCanvas from "@/components/ERDCanvas.vue";
 import ERDTopBar from "@/components/ERDTopBar.vue";
 import {onMounted, ref} from "vue";
 
-const erd = ref<ERDCanvas>();
+const erd = ref<typeof ERDCanvas>();
 
 function showExportCode(){
-  erd.value.showExportCode();
+  erd.value?.showExportCode();
 }
 
 function exportImage(){
-  erd.value.downloadImage();
+  erd.value?.downloadImage();
 }
 
 function zoom(scale:number) {
-  erd.value.zoom(scale);
+  erd.value?.zoom(scale);
 }
 
 function zoomFitToContent(){
-  erd.value.zoomFitToContent();
+  erd.value?.zoomFitToContent();
+}
+
+function gridDiagramVisible(visible: boolean) {
+  erd.value?.gridVisible(visible)
 }
 
 </script>

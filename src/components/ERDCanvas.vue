@@ -116,6 +116,9 @@ export default defineComponent({
     },
     zoomFitToContent(){
       this.erd.zoomFitToContent();
+    },
+    gridVisible(visible: boolean) {
+      this.erd.gridVisible = visible;
     }
   },
   data() {

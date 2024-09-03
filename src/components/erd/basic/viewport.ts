@@ -11,11 +11,13 @@ enum MouseAction {
 export class Viewport extends View {
     mouseAction: MouseAction;
     selected: Selectable[];
+    gridVisible: boolean;
 
     constructor(children: Element[] = []) {
         super(children);
         this.selected = [];
         this.mouseAction = MouseAction.Panning;
+        this.gridVisible = true;
         this.mouseHandler();
     }
 
@@ -33,10 +35,33 @@ export class Viewport extends View {
         }
         context.scale(this.scale, this.scale)
         context.translate(this.offset.x, this.offset.y)
+
+        if (this.gridVisible)
+            this.drawGrid(context);
+
         this.children.forEach(child => child.draw(context))
         if (this.clip) {
             context.restore();
         }
+        context.restore();
+    }
+
+    private drawGrid(context: CanvasRenderingContext2D, size = 15) {
+        context.save();
+        context.strokeStyle = "#616773"
+        context.lineWidth = 0.1 + Math.floor(1/this.scale)/10;
+        const gridSize = size + Math.floor(1/this.scale)*10
+        const [startX, startY] = this.convertGlobalPositionXYToLocal(0, 0);
+        const [endX, endY] = this.convertGlobalPositionXYToLocal(this.getWidth(), this.getHeight());
+        for (let i = Math.floor(startX/gridSize)*gridSize; i < endX; i+=gridSize) {
+            context.moveTo(i, startY);
+            context.lineTo(i, endY);
+        }
+        for (let i = Math.floor(startY/gridSize)*gridSize; i < endY; i+=gridSize) {
+            context.moveTo(startX, i);
+            context.lineTo(endX, i);
+        }
+        context.stroke();
         context.restore();
     }
 
