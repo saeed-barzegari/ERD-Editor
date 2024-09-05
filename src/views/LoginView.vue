@@ -40,9 +40,13 @@ async function loginUser() {
     if (data && typeof data === 'object') {
       if (data['username'])
         usernameErrors.value = data['username']
+      else
+        usernameErrors.value = []
 
       if (data['password'])
         passwordErrors.value = data['password']
+      else
+        passwordErrors.value = []
 
       if (data['detail'])
         notify({
@@ -60,7 +64,7 @@ async function loginUser() {
   <div class="login">
     <div class="card">
       <div class="header">
-        <h2>Login</h2>
+        <h2>Sign In</h2>
       </div>
       <div class="content">
         <div class="row">
@@ -88,7 +92,7 @@ async function loginUser() {
                   <span class="error-message" v-for="(error, i) in passwordErrors" :key="i">{{ error }}</span>
                 </div>
                 <div class="row">
-                  <button class="btn btn-green" type="submit">Login</button>
+                  <button class="btn btn-green" type="submit">Sign In</button>
                 </div>
               </div>
             </form>
