@@ -50,3 +50,79 @@ input:focus {
     border: none;
     outline: none;
 }
+
+.row{
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.column{
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.error-message {
+    color: #8d3736;
+    font-size: 0.65em;
+    padding: 4px 8px;
+}
+
+
+.card .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px;
+    margin: 4px;
+}
+
+.card .header {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    border-bottom: 1px solid #4f575f;
+    padding: 16px;
+    color: #b6b6b6;
+    font-size: 1.5em;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #4f575f;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.w-100{
+    width: 100%;
+}
+
+.w-80{
+    width: 80%;
+}
+
+.w-90{
+    width: 90%;
+}
+
+.w-50{
+    width: 50%;
+}
+
+.btn {
+    padding: 8px;
+    margin: 4px;
+    border-radius: 4px;
+
+}
+
+.btn-green {
+    background-color: #00CA4E;
+    color: #00481c;
+    box-shadow: 0 0 4px #00CA4E;
+    border: 1px solid #0dd95b;
+}
