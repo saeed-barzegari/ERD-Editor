@@ -7,6 +7,7 @@
         @onZoomOut="zoom(-0.1)"
         @onZoomFitToContent="zoomFitToContent"
         @onToggleGridDiagram="gridDiagramVisible"
+        @onLogout="logout"
     />
     <div class="main">
       <ERDCanvas ref="erd"/>
@@ -17,6 +18,8 @@
 import ERDCanvas from "@/components/ERDCanvas.vue";
 import ERDTopBar from "@/components/ERDTopBar.vue";
 import {onMounted, ref} from "vue";
+import {notify} from "@kyvg/vue3-notification";
+import router from "@/router";
 
 const erd = ref<typeof ERDCanvas>();
 
@@ -38,6 +41,15 @@ function zoomFitToContent(){
 
 function gridDiagramVisible(visible: boolean) {
   erd.value?.gridVisible(visible)
+}
+
+function logout(){
+  localStorage.removeItem("authToken");
+  notify({
+    title: "Authorization",
+    text: "You are logged out!",
+  });
+  router.push("login")
 }
 
 </script>
