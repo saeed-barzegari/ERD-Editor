@@ -1,4 +1,7 @@
 <template>
+  <div class="loading" v-if="loading">
+    <span>Loading...</span>
+  </div>
   <div class="erd">
     <ERDTopBar
         @onOpenCode="showExportCode"
@@ -8,6 +11,8 @@
         @onZoomFitToContent="zoomFitToContent"
         @onToggleGridDiagram="gridDiagramVisible"
         @onLogout="logout"
+        v-model:projectName="projectName"
+        v-model:versionNumber="versionNumber"
     />
     <div class="main">
       <ERDCanvas ref="erd"/>
@@ -34,10 +39,18 @@ if(!localStorage.getItem('authToken')){
 
 const route = useRoute();
 const erd = ref<typeof ERDCanvas>();
+const projectName = ref('');
+const versionNumber = ref(0);
+const loading = ref(true);
 
 axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']}/`)
     .then((response) => {
-      erd.value?.importProject(response.data['code'])
+      erd.value?.importProject(response.data['code']);
+      projectName.value = response.data['project_name'];
+      versionNumber.value = response.data['version_number'];
+      setTimeout(() => {
+        loading.value = false;
+      }, 500)
     })
     .catch(e => {
       const error = e as AxiosError
@@ -92,5 +105,20 @@ function logout(){
   flex-direction: row;
   height: calc(100% - 64px);
   width: 100%;
+}
+
+.loading {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #1c1e24;
+  z-index: 9999;
+  color: #00D8FF;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>

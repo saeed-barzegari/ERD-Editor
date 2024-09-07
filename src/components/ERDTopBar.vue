@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {ref, defineModel} from "vue";
 
 const gridVisible = ref(true);
+const projectName = defineModel('projectName', {default: ref("")})
+const versionNumber = defineModel('versionNumber', {default: ref(0)})
 
 function gridVisibleToggle(){
   gridVisible.value = !gridVisible.value
 }</script>
 
 <template>
-  <div class="top-bar">
-    <div>
+  <div id="navigator">
+    <div class="top-bar">
+      <div>
       <span class="icon icon-red" @click="$emit('onOpenCode')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24">
           <path d="M7 8L3 11.6923L7 16M17 8L21 11.6923L17 16M14 4L10 20" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-      <span class="icon icon-green" @click="$emit('onExportImage')">
+        <span class="icon icon-green" @click="$emit('onExportImage')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path
               d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z"
@@ -26,8 +29,8 @@ function gridVisibleToggle(){
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-    </div>
-    <div>
+      </div>
+      <div>
       <span class="icon" @click="$emit('onZoomOut')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path d="M10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z"
@@ -36,7 +39,7 @@ function gridVisibleToggle(){
           <path d="M6 10H14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-      <span class="icon" @click="$emit('onZoomIn')">
+        <span class="icon" @click="$emit('onZoomIn')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path d="M10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17Z"
                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,12 +48,12 @@ function gridVisibleToggle(){
           <path d="M10 6V14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-      <span class="icon" @click="$emit('onZoomFitToContent')">
+        <span class="icon" @click="$emit('onZoomFitToContent')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 32 32" fill="#d9d9d9">
           <path d="M27.333 4c1.841 0 3.333 1.492 3.333 3.333v0 16c0 1.841-1.492 3.333-3.333 3.333v0h-21.333c-1.841 0-3.333-1.492-3.333-3.333v0-16c0-1.841 1.492-3.333 3.333-3.333v0zM27.333 5.333h-21.333c-1.105 0-2 0.895-2 2v0 16c0 1.105 0.895 2 2 2v0h21.333c1.105 0 2-0.895 2-2v0-16c0-1.105-0.895-2-2-2v0zM21.333 12v6.667h-9.333v-6.667h9.333zM20 13.333h-6.667v4h6.667v-4z"></path>
         </svg>
       </span>
-      <span :class="gridVisible.valueOf() ? 'icon toggle-icon-enable': 'icon toggle-icon-disable'" @click="() => {gridVisibleToggle(); $emit('onToggleGridDiagram', gridVisible)}">
+        <span :class="gridVisible.valueOf() ? 'icon toggle-icon-enable': 'icon toggle-icon-disable'" @click="() => {gridVisibleToggle(); $emit('onToggleGridDiagram', gridVisible)}">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M2.03 8.5H22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -59,14 +62,19 @@ function gridVisibleToggle(){
           <path d="M15.51 21.99V2.01001" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-    </div>
-    <div>
+      </div>
+      <div>
       <span class="icon icon-red" @click="$emit('onLogout')">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none">
           <path d="M9.00195 7C9.01406 4.82497 9.11051 3.64706 9.87889 2.87868C10.7576 2 12.1718 2 15.0002 2L16.0002 2C18.8286 2 20.2429 2 21.1215 2.87868C22.0002 3.75736 22.0002 5.17157 22.0002 8L22.0002 16C22.0002 18.8284 22.0002 20.2426 21.1215 21.1213C20.2429 22 18.8286 22 16.0002 22H15.0002C12.1718 22 10.7576 22 9.87889 21.1213C9.11051 20.3529 9.01406 19.175 9.00195 17" stroke-width="1.5" stroke-linecap="round"/>
           <path d="M15 12L2 12M2 12L5.5 9M2 12L5.5 15" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
+      </div>
+    </div>
+    <div class="project-info">
+      <span>{{ projectName }}</span>
+      <span>V{{ versionNumber }}</span>
     </div>
   </div>
 </template>
@@ -83,6 +91,7 @@ function gridVisibleToggle(){
   display: flex;
   flex-direction: row;
   align-items: center;
+  box-shadow: 0 0 1px #00D8FF;
 }
 
 .top-bar > * {
@@ -141,5 +150,28 @@ function gridVisibleToggle(){
 
 .toggle-icon-disable {
   stroke: #525252;
+}
+
+.project-info {
+  min-width: 200px;
+  color: #d9d9d9;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding: 4px;
+  border: 1px solid #2d2f38;
+  background-color: #1c1e24;
+  position: absolute;
+  top: 65px;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 1px 2px #00D8FF;
+}
+
+
+#navigator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
 }
 </style>
