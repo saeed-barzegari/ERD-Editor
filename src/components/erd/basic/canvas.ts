@@ -35,7 +35,6 @@ export class Canvas {
     }
 
     set resolution(value: number) {
-        console.log(value)
         this._resolution = Math.max(1, value);
     }
 

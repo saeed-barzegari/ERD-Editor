@@ -116,7 +116,6 @@ export class Table extends Column implements Selectable {
         if (this.isSelected.value)
             return super.click(x, y);
         else if (this.isInArea(x, y)) {
-            console.log('click')
             this.emit('click', x, y);
             return true;
         }

@@ -323,7 +323,6 @@ export abstract class Element extends EventEmitter implements Drawable{
             const view = viewStack.pop();
             if (view == null) continue;
             pos = view.convertGlobalPositionToLocal(pos);
-            console.log("convert")
         }
         this.position.set(pos.x, pos.y);
     }

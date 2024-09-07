@@ -26,15 +26,11 @@ export class Erd extends Viewport {
     constructor() {
         super();
         this.background = "#1c1e24";
-        const table = this.addTableWithGlobalPos(0, 0)
-        console.log(table.getLeftX() + " " + table.getTopY())
-        this.addTableWithGlobalPos(1366, 576)
 
         this.addListener('click', () => {
             this.selected.forEach(child => {
                 child.setSelected(false);
             })
-            console.log(diagramToMySQLCode(this));
         })
     }
 
@@ -216,7 +212,6 @@ export class Erd extends Viewport {
             const fromTable = this.getTableById(referenceDatabaseModel.fromTableId);
             if (!toTable || !fromTable) continue;
             const reference = new Reference(fromTable, toTable, true);
-            console.log("ref import")
             reference.importDatabaseModel(referenceDatabaseModel);
             this.addReferenceWithReference(reference)
         }
@@ -296,9 +291,6 @@ export function show(canvas: HTMLCanvasElement, parent: HTMLElement, e: Erd) {
     canvas.height = parent.offsetHeight * scale;
 
 
-    parent.addEventListener('resize', () => {
-        console.log('resize')
-    })
     window.onresize = function () {
         canvas.style.width = String(parent.clientWidth);
         canvas.style.height = String(parent.offsetHeight);
