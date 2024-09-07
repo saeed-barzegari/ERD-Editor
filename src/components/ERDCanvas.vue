@@ -122,6 +122,9 @@ export default defineComponent({
     },
     importProject(project: object) {
       this.erd.importProject(project);
+    },
+    exportProject(){
+      return this.erd.exportProject();
     }
   },
   data() {

@@ -11,6 +11,7 @@
         @onZoomFitToContent="zoomFitToContent"
         @onToggleGridDiagram="gridDiagramVisible"
         @onLogout="logout"
+        @onSave="saveProject"
         v-model:projectName="projectName"
         v-model:versionNumber="versionNumber"
     />
@@ -87,6 +88,23 @@ function logout(){
     text: "You are logged out!",
   });
   router.push("login")
+}
+
+async function saveProject() {
+  try {
+    await axios.post(`http://localhost:8000/project/save_project/${route.params['slug']}/`, {
+      code: erd.value?.exportProject(),
+    })
+    notify({
+      title: "Project",
+      text: "Project saved.",
+    });
+    versionNumber.value = versionNumber.value + 1;
+  } catch (e) {
+    const error = e as AxiosError
+    if (error.status == 401)
+      await router.push('login')
+  }
 }
 
 </script>
