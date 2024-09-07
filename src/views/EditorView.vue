@@ -46,7 +46,8 @@ const loading = ref(true);
 
 axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']}/`)
     .then((response) => {
-      erd.value?.importProject(response.data['code']);
+      if (response.data['code'])
+        erd.value?.importProject(response.data['code']);
       projectName.value = response.data['project_name'];
       versionNumber.value = response.data['version_number'];
       setTimeout(() => {
@@ -57,8 +58,6 @@ axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']
       const error = e as AxiosError
       if(error.status == 401)
         router.push('login')
-      else if (error.status != 400)
-        router.push('/dashboard')
     })
 
 function showExportCode(){
