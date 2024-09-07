@@ -24,7 +24,7 @@ if(localStorage.getItem('authToken')){
     title: "Authorization",
     text: "You have been logged in!",
   });
-  router.push('/editor');
+  router.push('/dashboard');
 }
 async function loginUser() {
   try {

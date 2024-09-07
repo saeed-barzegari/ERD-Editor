@@ -23,6 +23,8 @@
 <script setup lang="ts">
 
 import {Notifications} from "@kyvg/vue3-notification";
+import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = `Token ${localStorage.getItem("authToken")}`
 document.oncontextmenu = function (){return false}
 </script>
