@@ -85,7 +85,6 @@ export class Erd extends Viewport {
     addTable(table: Table) {
         this.addChild(table);
         this.tables.push(table);
-        this.emit('edit-table', table);
         this.table = table;
         table.addListener('click', () => {
             this.selected.forEach(selectedTable => selectedTable.setSelected(false)) // TODO: MOVE TO VIEWPORT
@@ -199,7 +198,8 @@ export class Erd extends Viewport {
         }
     }
 
-    importProject(project: Project) {
+    importProject(p: object) {
+        const project = p as Project;
         this.importDiagramModel(project.diagramModel);
         this.importDatabaseModel(project.databaseModel);
     }

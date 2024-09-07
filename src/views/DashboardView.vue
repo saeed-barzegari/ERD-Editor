@@ -95,7 +95,7 @@ enum Accessibility {
               <span class="w-50">Time Created</span>
             </div>
           </div>
-          <div class="project" v-for="(project, i) in projects" :key="i">
+          <div class="project" v-for="(project, i) in projects" :key="i" @click="$router.push({name: 'editor', params: { slug: project['id'] } })">
             <span class="w-40">{{ project['name'] }}</span>
             <span class="w-20">{{ accessibilityToString(project['membership_type']) }}</span>
             <div class="row w-40">

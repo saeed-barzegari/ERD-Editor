@@ -119,6 +119,9 @@ export default defineComponent({
     },
     gridVisible(visible: boolean) {
       this.erd.gridVisible = visible;
+    },
+    importProject(project: object) {
+      this.erd.importProject(project);
     }
   },
   data() {
