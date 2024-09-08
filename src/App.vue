@@ -1,6 +1,6 @@
 <template>
   <notifications />
-    <div id="container">
+    <div id="container" class="prevent-select">
       <router-view/>
     </div>
 </template>

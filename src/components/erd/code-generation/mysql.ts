@@ -7,7 +7,12 @@ export function diagramToMySQLCode(erd: Erd) {
         const constraint: string[] = [];
 
         for (const primaryKeyColumn of table.primaryKeyColumns) {
-            columns.push(`\t${primaryKeyColumn.name} ${primaryKeyColumn.type}`)
+            let column = `\t${primaryKeyColumn.name} ${primaryKeyColumn.type}`
+            if(!primaryKeyColumn.nullable)
+                column += ' NOT NULL'
+            if(primaryKeyColumn.unique)
+                column += ' UNIQUE'
+            columns.push(column)
             constraint.push(`\tPRIMARY KEY (${primaryKeyColumn.name})`)
         }
 

@@ -10,6 +10,7 @@ export class TableColumn extends Row {
     private _foreignKey:TableColumn | null = null;
     private _type = ""
     private _nullable = false;
+    private _unique = false;
 
     constructor(name: string) {
         super();
@@ -88,13 +89,22 @@ export class TableColumn extends Row {
         return this._id;
     }
 
+    get unique(): boolean {
+        return this._unique;
+    }
+
+    set unique(value: boolean) {
+        this._unique = value;
+    }
+
     exportDatabaseModel() {
         return {
             id: this.id,
             name: this.name,
             type: this.type,
             primaryKey: this.primaryKey,
-            nullable: this.nullable
+            nullable: this.nullable,
+            unique: this.unique
         } as ColumnDatabaseModel;
     }
 
@@ -104,5 +114,6 @@ export class TableColumn extends Row {
         this.type = columnDatabaseModel.type;
         this.primaryKey = columnDatabaseModel.primaryKey;
         this.nullable = columnDatabaseModel.nullable;
+        this.unique = columnDatabaseModel.unique;
     }
 }

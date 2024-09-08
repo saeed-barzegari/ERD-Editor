@@ -7,9 +7,10 @@ import {Canvas} from "@/components/erd/basic/canvas";
 import {TableColumn} from "@/components/erd/table-column";
 import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
 import ExportCode from "@/components/ExportCode.vue";
+import TextToggle from "@/components/TextToggle.vue";
 
 export default defineComponent({
-  components: {ExportCode},
+  components: {TextToggle, ExportCode},
   computed: {
     ContextMenuContent() {
       return ContextMenuContent
@@ -190,6 +191,10 @@ export default defineComponent({
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <input v-model="column.type" placeholder="<Data Type>">
+            <div class="options">
+              <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
+              <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
+            </div>
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
@@ -204,6 +209,10 @@ export default defineComponent({
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <input v-model="column.type" placeholder="<Data Type>">
+            <div class="options">
+              <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
+              <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
+            </div>
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
@@ -287,6 +296,11 @@ export default defineComponent({
   justify-content: center;
 }
 
+.column .options {
+  display: flex;
+  align-items: center;
+}
+
 .column .drag {
   align-content: center;
   padding: 5px;
@@ -307,7 +321,19 @@ export default defineComponent({
 .add_column {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   margin-left: 13px;
+}
+
+.text-toggle {
+  margin: 0 4px;
+  font-size: 0.8em;
+}
+
+.text-toggle.enable {
+  color: #b0aa26;
+}
+
+.text-toggle.disable {
+  color: #6b6b6b;
 }
 </style>
