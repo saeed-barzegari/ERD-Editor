@@ -97,6 +97,7 @@ export class Table extends Column implements Selectable {
         if (column.primaryKey) {
             const index = this._primaryKeyColumns.indexOf(column);
             if (index != -1){
+                column.setPrimaryKey(false);
                 this._primaryKeyColumns.remove(index);
                 this.emit("remove-column")
             }

@@ -244,13 +244,10 @@ export class Reference extends Path {
         for (const fkColumnDatabaseModel of referenceDatabaseModel.fkColumns) {
             const pkColumn = this.toTable.getColumnById(fkColumnDatabaseModel.pkColumnId);
             const fkColumn = this.fromTable.getColumnById(fkColumnDatabaseModel.fkColumnId);
-            console.log("pre import fk")
-            console.log(pkColumn);
-            console.log(fkColumn)
             if (!pkColumn || !fkColumn)
                 continue;
-            console.log("import fk")
             fkColumn.foreignKey = pkColumn;
+            this.registerColumnToForeignKey(pkColumn, fkColumn)
             this.foreignKeyColumns.push(fkColumn);
         }
     }
