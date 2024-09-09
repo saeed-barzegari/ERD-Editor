@@ -51,12 +51,11 @@ export class Reference extends Path {
     }
 
     private registerColumnToForeignKey(referenceColumn:TableColumn, foreignKeyColumn?:TableColumn){
-        const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(referenceColumn.name);
+        const fkColumn = foreignKeyColumn ? foreignKeyColumn : new TableColumn(this.toTable.name + "_" + referenceColumn.name);
         this.foreignKeyColumns.push(fkColumn);
         fkColumn.foreignKey = referenceColumn;
         if(!foreignKeyColumn)
             this.fromTable.addColumnWithColumn(fkColumn);
-        referenceColumn.addListener("changeName", name => fkColumn.name = name); // TODO: if name is not auto generate this not listening
         referenceColumn.addListener("changePrimaryKey", () => {
             this.fromTable.removeColumn(fkColumn);
             this.foreignKeyColumns.remove(this.foreignKeyColumns.indexOf(fkColumn));

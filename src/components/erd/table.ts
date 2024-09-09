@@ -141,7 +141,7 @@ export class Table extends Column implements Selectable {
     }
 
     set name(value: string) {
-        this._name.value = value;
+        this._name.value = value.replace(" ", "_");
     }
 
     get tableColor(): string {
