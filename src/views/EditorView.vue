@@ -63,7 +63,7 @@ axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']
     .catch(e => {
       const error = e as AxiosError
       if(error.status == 401)
-        router.push('login')
+        router.push('/login')
     })
 
 if (route.name == "different") {
@@ -85,14 +85,14 @@ if (route.name == "different") {
             .catch(e => {
               const error = e as AxiosError
               if (error.status == 401)
-                router.push('login')
+                router.push('/login')
               console.log(e)
             })
       })
       .catch(e => {
         const error = e as AxiosError
         if (error.status == 401)
-          router.push('login')
+          router.push('/login')
       })
 
 }
@@ -127,7 +127,7 @@ function logout(){
     title: "Authorization",
     text: "You are logged out!",
   });
-  router.push("login")
+  router.push("/login")
 }
 
 async function saveProject() {

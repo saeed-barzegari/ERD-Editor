@@ -46,7 +46,7 @@ async function loginUser() {
     });
     const token = data.token;
     localStorage.setItem('authToken', token);
-    await router.push('/editor');
+    await router.push('/dashboard');
   } catch (e) {
     const error = e as AxiosError;
     if (!error.response)
