@@ -10,7 +10,7 @@
         @onZoomOut="zoom(-0.1)"
         @onZoomFitToContent="zoomFitToContent"
         @onToggleGridDiagram="gridDiagramVisible"
-        @onLogout="logout"
+        @onBack="back"
         @onSave="saveProject"
         @onDifferentShow="showDifferentVersionsModal"
         v-model:projectName="projectName"
@@ -121,13 +121,8 @@ function gridDiagramVisible(visible: boolean) {
   erd.value?.gridVisible(visible)
 }
 
-function logout(){
-  localStorage.removeItem("authToken");
-  notify({
-    title: "Authorization",
-    text: "You are logged out!",
-  });
-  router.push("/login")
+function back(){
+  router.back();
 }
 
 async function saveProject() {
