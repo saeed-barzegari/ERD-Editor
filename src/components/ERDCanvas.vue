@@ -22,16 +22,18 @@ export default defineComponent({
   methods: {
     diagramToMySQLCode,
     showContextMenu(x: number, y: number) {
-      this.contextMenuIsHidden = false;
       const menu = this.$refs.menu as HTMLElement;
-      menu.style.left = `${x}px`;
-      menu.style.top = `${y}px`;
-      const hideListener = () => {
-        this.hideContextMenu();
-        window.removeEventListener('click', hideListener);
+      if (menu) {
+        this.contextMenuIsHidden = false;
+        menu.style.left = `${x}px`;
+        menu.style.top = `${y}px`;
+        const hideListener = () => {
+          this.hideContextMenu();
+          window.removeEventListener('click', hideListener);
+        }
+        window.addEventListener('click', hideListener)
+        return false;
       }
-      window.addEventListener('click', hideListener)
-      return false;
     },
     hideContextMenu() {
       this.contextMenuIsHidden = true;
@@ -177,7 +179,7 @@ export default defineComponent({
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.TableContextMenu">
         <li @click="erd.setReferencingMode()">Add Relationship</li>
-        <li @click="erd.table?.addColumn()">Add Column</li>
+        <li @click="erd.table.addColumn()">Add Column</li>
         <li @click="removeTable">Remove</li>
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.ReferenceContextMenu">
@@ -202,9 +204,9 @@ export default defineComponent({
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
             <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
           </div>
         </div>
         <hr style="width: 100%">
@@ -220,9 +222,9 @@ export default defineComponent({
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
             <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
           </div>
           </div>
         </div>

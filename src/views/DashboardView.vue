@@ -15,6 +15,7 @@ axios.get('http://127.0.0.1:8000/project/').then((response) => {
   projects.value = response.data
 }).catch((e) => {
   console.log(e)
+  projects.value = [];
 })
 
 function accessibilityToString(accessibility: number) {

@@ -21,8 +21,8 @@ export class Erd extends Viewport {
     references: Reference[] = [];
     tables: Table[] = [];
     private tableCounter = 1;
-    table: Table | null = null;
-    reference: Reference | null = null
+    table: Table = new Table();
+    reference: Reference = new Reference(this.table, this.table);
     mode = ERDMode.Editing;
 
     constructor() {
@@ -43,8 +43,7 @@ export class Erd extends Viewport {
             if(this.mode == ERDMode.Referencing) {
                 this.tables.forEach(table => {
                     if (table.isInArea(localX, localY)) {
-                        if (this.table)
-                            this.addReferenceWithReference(new Reference(this.table, table))
+                        this.addReferenceWithReference(new Reference(this.table, table))
                         this.mode = ERDMode.Editing;
                     }
                 })

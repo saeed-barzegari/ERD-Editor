@@ -1,5 +1,6 @@
 <template>
   <notifications />
+  <NavigatorTopBar v-if="route.name != 'editor' && route.name != 'different'" :key="$route.fullPath"/>
     <div id="container" class="prevent-select">
       <router-view :key="$route.fullPath"/>
     </div>
@@ -13,7 +14,7 @@
 
 #app{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100vh;
   width: 100%;
   background: #1c1e24;
@@ -24,7 +25,11 @@
 
 import {Notifications} from "@kyvg/vue3-notification";
 import axios from "axios";
+import NavigatorTopBar from "@/components/NavigatorTopBar.vue";
+import router from "@/router";
+import {useRoute} from "vue-router";
 
+const route = useRoute();
 axios.defaults.headers.common['Authorization'] = `Token ${localStorage.getItem("authToken")}`
 document.oncontextmenu = function (){return false}
 </script>

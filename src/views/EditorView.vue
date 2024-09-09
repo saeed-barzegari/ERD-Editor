@@ -45,7 +45,7 @@ const route = useRoute();
 const erd = ref<typeof ERDCanvas>();
 const projectName = ref('');
 const versionNumber = ref(0);
-const loading = ref(true);
+const loading = ref(false);
 const differentModalVisible = ref(false);
 
 axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']}/`)
@@ -122,7 +122,11 @@ function gridDiagramVisible(visible: boolean) {
 }
 
 function back(){
-  router.back();
+  if (route.name == 'editor'){
+    router.push("/dashboard")
+  } else {
+    router.push({name: 'editor', params: {slug: route.params['slug']}})
+  }
 }
 
 async function saveProject() {
