@@ -20,7 +20,8 @@ export class Erd extends Viewport {
     references: Reference[] = [];
     tables: Table[] = [];
     private tableCounter = 1;
-    table = new Table();
+    table: Table | null = null;
+    reference: Reference | null = null
     mode = ERDMode.Editing;
 
     constructor() {
@@ -56,11 +57,11 @@ export class Erd extends Viewport {
             let hit = false;
             const mousePosition = new Point(ev.offsetX, ev.offsetY);
             const localMousePosition = this.convertGlobalPositionToLocal(mousePosition.copy())
-            this.tables.forEach(child => {
-                if (child.isInArea(localMousePosition.x, localMousePosition.y)) {
+            this.tables.forEach(table => {
+                if (table.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
-                    this.table = child as Table;
                     this.emit('contextmenu', mousePosition, ContextMenuContent.TableContextMenu);
+                    this.table = table;
                 }
             })
             if (hit) return;
@@ -69,6 +70,7 @@ export class Erd extends Viewport {
                 if (ref.isInArea(localMousePosition.x, localMousePosition.y)) {
                     hit = true;
                     this.emit('contextmenu', mousePosition, ContextMenuContent.ReferenceContextMenu)
+                    this.reference = ref;
                 }
             })
             if (hit) return;
@@ -125,6 +127,12 @@ export class Erd extends Viewport {
         const index = this.tables.indexOf(table);
         this.tables.remove(index);
         this.removeChild(table);
+        this.getReferencesByFromTable(table).forEach(ref => {
+            this.removeReferenceByReference(ref)
+        });
+        this.getReferencesByToTable(table).forEach(ref => {
+            this.removeReferenceByReference(ref)
+        })
     }
 
     setReferencingMode(){
@@ -265,6 +273,18 @@ export class Erd extends Viewport {
             this.scale = Math.min(1, widthScale, heightScale)
         }
         this.offset.set(this.getWidth()/2 - ((minX + maxX) / 2) * this.scale, this.getHeight()/2 - ((minY + maxY) / 2) * this.scale)
+    }
+
+    removeActiveReference() {
+        this.removeReferenceByReference(this.reference)
+    }
+
+    removeReferenceByReference(ref:Reference){
+        const indexReferences = this.references.indexOf(ref);
+        const indexChildren = this.children.indexOf(ref);
+        ref.remove();
+        this.references.remove(indexReferences);
+        this.children.remove(indexChildren);
     }
 }
 

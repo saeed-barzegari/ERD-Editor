@@ -66,12 +66,11 @@ export default defineComponent({
       this.showTableEditor(xRightClick, yRightClick);
     },
     removeTable() {
-      this.erd.removeTable(this.table as Table);
+      this.erd.removeTable(this.erd.table as Table);
     },
     changeTableName(ev: FocusEvent) {
       if (!ev.target) return;
       const target = ev.target as HTMLInputElement
-      this.table.name = target.value; // TODO: check for duplicate table name
       target.value = "";
     },
     startColumnDrag(ev: DragEvent, list: number, columnIndex: number) {
@@ -84,20 +83,20 @@ export default defineComponent({
       const columnIndex = parseInt(ev.dataTransfer?.getData("columnIndex") as string);
       const columnList = parseInt(ev.dataTransfer?.getData("columnList") as string);
       const columnHeight = parseInt(ev.dataTransfer?.getData("columnHeight") as string);
-      const column = (columnList == 0 ? this.table.primaryKeyColumns[columnIndex] : this.table.columns[columnIndex]) as TableColumn;
+      const column = (columnList == 0 ? this.erd.table?.primaryKeyColumns[columnIndex] : this.erd.table?.columns[columnIndex]) as TableColumn;
       const dropZone = (list == 0 ? this.$refs.primaryKeyZone : this.$refs.nonPrimaryKeyZone) as HTMLElement;
       const dropZoneRect = dropZone.getBoundingClientRect() as DOMRect;
       const index = Math.floor((ev.clientY - dropZoneRect.y + columnHeight / 2) / columnHeight)
 
       if (columnList != list){
-        this.table.removeColumn(column);
+        this.erd.table?.removeColumn(column);
         column.primaryKey = !column.primaryKey;
-        this.table.addColumnWithColumn(column, index);
+        this.erd.table?.addColumnWithColumn(column, index);
       } else {
         if(columnList == 0)
-          this.table.primaryKeyColumns.move(columnIndex, index);
+          this.erd.table?.primaryKeyColumns.move(columnIndex, index);
         else
-          this.table.columns.move(columnIndex, index);
+          this.erd.table?.columns.move(columnIndex, index);
       }
     },
     showExportCode(){
@@ -125,6 +124,9 @@ export default defineComponent({
     },
     exportProject(){
       return this.erd.exportProject();
+    },
+    toggleGridVisible() {
+      this.gridVisible(!this.erd.gridVisible)
     }
   },
   data() {
@@ -132,7 +134,6 @@ export default defineComponent({
       contextMenuIsHidden: ref(true),
       contextMenuContent: ContextMenuContent.CanvasContextMenu,
       tableEditorIsHidden: ref(true),
-      table: new Table(),
       erd: new Erd(),
       canvas: Canvas.getSingleton(),
       exportCodeVisible: ref(false),
@@ -145,7 +146,6 @@ export default defineComponent({
     show(canvasElement, rootElement, this.erd as Erd);
 
     this.erd.addListener('edit-table', table => {
-      this.table = table;
       const position = table.getGlobalPosition();
       this.showTableEditor(position.x, position.y);
     })
@@ -153,7 +153,6 @@ export default defineComponent({
     this.erd.addListener('contextmenu', (pos, context: ContextMenuContent) => {
       this.contextMenuContent = context;
       this.showContextMenu(pos.x, pos.y);
-      this.table = this.erd.table;
     })
   }
 })
@@ -167,27 +166,29 @@ export default defineComponent({
 
     <div class="right-click-menu" ref="menu" v-show="!contextMenuIsHidden">
       <ul v-if="contextMenuContent === ContextMenuContent.CanvasContextMenu">
-        <li @click="addTable">add table</li>
-        <li>sort</li>
+        <li @click="addTable">Add Table</li>
+        <li @click="zoomFitToContent">Zoom Fit To Content</li>
+        <li @click="toggleGridVisible"><span v-if="erd.gridVisible">Hide Grid</span><span v-else>Show Grid</span></li>
+        <li @click="showExportCode">Export Code</li>
+        <li @click="downloadImage()">Export Image</li>
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.TableContextMenu">
-        <li @click="erd.setReferencingMode()">add Relationship</li>
-        <li @click="removeTable">remove</li>
-        <li>sort</li>
+        <li @click="erd.setReferencingMode()">Add Relationship</li>
+        <li @click="erd.table?.addColumn()">Add Column</li>
+        <li @click="removeTable">Remove</li>
       </ul>
       <ul v-if="contextMenuContent === ContextMenuContent.ReferenceContextMenu">
-        <li @click="addTable">Convert</li>
-        <li @click="()=> {showExportCode()}">sort</li>
+        <li @click="erd.removeActiveReference()">Remove</li>
       </ul>
     </div>
 
-    <div id="table-editor" ref="tableEditor" v-show="!tableEditorIsHidden">
+    <div id="table-editor" ref="tableEditor" v-show="!tableEditorIsHidden" v-if="erd.table != null">
       <div class="header">
-        <input class="table-name" @focusout="changeTableName" ref="tableName" v-model="table.name">
+        <input class="table-name" @focusout="changeTableName" ref="tableName" v-model="erd.table.name">
       </div>
       <div class="columns">
         <div class="pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 0)" ref="primaryKeyZone">
-          <div class="column" v-for="(column, index) in table.primaryKeyColumns" v-bind:key="index">
+          <div class="column" v-for="(column, index) in erd.table.primaryKeyColumns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <input v-model="column.type" placeholder="<Data Type>">
@@ -198,27 +199,27 @@ export default defineComponent({
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
             <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
           </div>
         </div>
         <hr style="width: 100%">
         <div class="non-pk-columns" @dragenter.prevent @dragover.prevent @drop="onDropColumn($event, 1)" ref="nonPrimaryKeyZone">
-          <div class="column" v-for="(column, index) in table.columns" v-bind:key="index">
+          <div class="column" v-for="(column, index) in erd.table.columns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <input v-model="column.type" placeholder="<Data Type>">
             <div class="options">
               <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
-              <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
+              <TextToggle text="UNIQUE" cl                                             ass="text-toggle" v-model:value="column.unique"/>
             </div>
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
             <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') table.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table?.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
           </div>
           </div>
         </div>
@@ -246,9 +247,17 @@ export default defineComponent({
   background: #1c1e24;
   border: 1px solid #2d2f38;
   color: #828691;
-  padding: 6px;
   border-radius: 4px;
   user-select: none;
+  min-width: 150px;
+}
+
+.right-click-menu > ul > li {
+  margin: 4px 8px;
+}
+
+.right-click-menu > ul > li:hover {
+  background: #5f6770;
 }
 
 #table-editor {

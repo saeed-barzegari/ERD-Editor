@@ -63,7 +63,7 @@ export class Table extends Column implements Selectable {
         })
     }
 
-    addColumn(columnArgs:{name?:string, type?:string, primaryKey?:boolean}, index = -1){
+    addColumn(columnArgs:{name?:string, type?:string, primaryKey?:boolean} = {}, index = -1){
         const columnName: string = columnArgs.name || this.generateUniqueColumnName();
         const column = new TableColumn(columnName);
         column.type = columnArgs.type || "";

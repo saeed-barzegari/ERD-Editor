@@ -246,4 +246,10 @@ export class Reference extends Path {
             this.foreignKeyColumns.push(fkColumn);
         }
     }
+
+    remove() {
+        this.foreignKeyColumns.forEach(column => {
+            this.fromTable.removeColumn(column);
+        })
+    }
 }
