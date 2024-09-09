@@ -8,6 +8,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/EditorView.vue')
   },
   {
+    path: '/different/:slug/:version1/:version2/',
+    name: 'different',
+    props: true,
+    component: () => import('../views/EditorView.vue')
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')

@@ -127,6 +127,9 @@ export default defineComponent({
     },
     toggleGridVisible() {
       this.gridVisible(!this.erd.gridVisible)
+    },
+    differentBetweenVersions(project1: object, project2: object) {
+      this.erd.differentBetweenVersions(project1, project2);
     }
   },
   data() {

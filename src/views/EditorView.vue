@@ -12,6 +12,7 @@
         @onToggleGridDiagram="gridDiagramVisible"
         @onLogout="logout"
         @onSave="saveProject"
+        @onDifferentShow="showDifferentVersionsModal"
         v-model:projectName="projectName"
         v-model:versionNumber="versionNumber"
     />
@@ -19,6 +20,7 @@
       <ERDCanvas ref="erd"/>
     </div>
   </div>
+  <DifferentVersionModal v-model:maxVersionNumber="versionNumber" v-model:visible="differentModalVisible"/>
 </template>
 <script setup lang="ts">
 import ERDCanvas from "@/components/ERDCanvas.vue";
@@ -28,6 +30,7 @@ import {notify} from "@kyvg/vue3-notification";
 import router from "@/router";
 import axios, {AxiosError} from "axios";
 import {useRoute} from "vue-router";
+import DifferentVersionModal from "@/components/DifferentVersionModal.vue";
 
 if(!localStorage.getItem('authToken')){
   notify({
@@ -43,22 +46,60 @@ const erd = ref<typeof ERDCanvas>();
 const projectName = ref('');
 const versionNumber = ref(0);
 const loading = ref(true);
+const differentModalVisible = ref(false);
 
 axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']}/`)
     .then((response) => {
-      if (response.data['code'])
-        erd.value?.importProject(response.data['code']);
       projectName.value = response.data['project_name'];
       versionNumber.value = response.data['version_number'];
-      setTimeout(() => {
-        loading.value = false;
-      }, 500)
+      if (route.name == "editor") {
+        if (response.data['code'])
+          erd.value?.importProject(response.data['code']);
+        setTimeout(() => {
+          loading.value = false;
+        }, 500)
+      }
     })
     .catch(e => {
       const error = e as AxiosError
       if(error.status == 401)
         router.push('login')
     })
+
+if (route.name == "different") {
+  axios.get(`http://localhost:8000/project/get_version/${route.params['slug']}/${route.params['version1']}/`)
+      .then((response) => {
+        let project1 = {};
+        if (response.data['code'])
+          project1 = response.data['code'];
+
+        axios.get(`http://localhost:8000/project/get_version/${route.params['slug']}/${route.params['version2']}/`)
+            .then((response) => {
+              if (response.data['code']) {
+                erd.value?.differentBetweenVersions(project1, response.data['code']);
+              }
+              setTimeout(() => {
+                loading.value = false;
+              }, 500)
+            })
+            .catch(e => {
+              const error = e as AxiosError
+              if (error.status == 401)
+                router.push('login')
+              console.log(e)
+            })
+      })
+      .catch(e => {
+        const error = e as AxiosError
+        if (error.status == 401)
+          router.push('login')
+      })
+
+}
+
+function showDifferentVersionsModal() {
+  differentModalVisible.value = true;
+}
 
 function showExportCode(){
   erd.value?.showExportCode();

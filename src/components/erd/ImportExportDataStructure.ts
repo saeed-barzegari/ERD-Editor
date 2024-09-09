@@ -20,6 +20,7 @@ interface ForeignKeyDatabaseModel {
 }
 
 interface ReferenceDatabaseModel {
+    id: string,
     fkColumns: ForeignKeyDatabaseModel[],
     toTableId: string,
     fromTableId: string,

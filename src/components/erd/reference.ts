@@ -2,7 +2,7 @@ import {Path} from "@/components/erd/basic/path";
 import {Table} from "@/components/erd/table";
 import {Point} from "@/components/erd/basic/point";
 import {TableColumn} from "@/components/erd/table-column";
-import {Erd} from "@/components/erd/erd";
+import {v4 as uuid} from "uuid";
 
 enum PointDirection {
     Top,
@@ -17,16 +17,18 @@ export enum ReferenceNotation {
 }
 
 export class Reference extends Path {
+    private _id: string;
     fromTable: Table;
     toTable: Table;
     foreignKeyColumns:TableColumn[] = [];
     _identifying = false;
     static notation: ReferenceNotation = ReferenceNotation.IDEF1X;
 
-    constructor(fromTable: Table, toTable: Table, isImportingProject = false) {
+    constructor(fromTable: Table, toTable: Table, isImportingProject = false, id = uuid()) {
         super();
         this.fromTable = fromTable;
         this.toTable = toTable;
+        this._id = id;
 
         this.addPoint(0, 0);
         this.addPoint(0, 0)
@@ -217,6 +219,10 @@ export class Reference extends Path {
         this._identifying = value;
     }
 
+    get id(): string {
+        return this._id;
+    }
+
     exportDatabaseModel() {
         const foreignKeysDatabaseModel:ForeignKeyDatabaseModel[] = [];
         for (const foreignKeyColumn of this.foreignKeyColumns) {
@@ -226,6 +232,7 @@ export class Reference extends Path {
             } as ForeignKeyDatabaseModel)
         }
         return {
+            id: this._id,
             fkColumns: foreignKeysDatabaseModel,
             toTableId: this.toTable.id,
             fromTableId: this.fromTable.id,
@@ -233,6 +240,7 @@ export class Reference extends Path {
     }
 
     importDatabaseModel(referenceDatabaseModel: ReferenceDatabaseModel) {
+        this._id = referenceDatabaseModel.id
         for (const fkColumnDatabaseModel of referenceDatabaseModel.fkColumns) {
             const pkColumn = this.toTable.getColumnById(fkColumnDatabaseModel.pkColumnId);
             const fkColumn = this.fromTable.getColumnById(fkColumnDatabaseModel.fkColumnId);

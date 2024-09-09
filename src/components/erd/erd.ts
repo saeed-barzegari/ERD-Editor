@@ -4,6 +4,7 @@ import {Table} from "@/components/erd/table";
 import {Reference} from "@/components/erd/reference";
 import {Point} from "@/components/erd/basic/point";
 import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
+import {TableColumn} from "@/components/erd/table-column";
 
 export enum ContextMenuContent {
     TableContextMenu,
@@ -287,6 +288,109 @@ export class Erd extends Viewport {
         ref.remove();
         this.references.remove(indexReferences);
         this.children.remove(indexChildren);
+    }
+
+    getReferenceById(id: string) {
+        for (const reference of this.references) {
+            if(reference.id == id)
+                return reference;
+        }
+    }
+
+    differentBetweenVersions(v1: object | null, v2: object){
+        const REMOVED_COLOR = "#730707";
+        const ADDED_COLOR = "#1e7307";
+        const CHANGED_COLOR = "#5f0773";
+        const TABLE_DEFAULT_COLOR = "#24262d";
+        const COLUMN_DEFAULT_COLOR = "#00000000";
+        const REFERENCE_DEFAULT_COLOR = "#FFFFFF";
+        const version2 = v2 as Project;
+
+        this.importProject(version2);
+        this.tables.forEach(table => {
+            table.tableColor = ADDED_COLOR;
+        })
+        this.references.forEach(reference => {
+            reference.setColor(ADDED_COLOR);
+        })
+
+        const version1 = v1 as Project;
+        console.log(version1)
+        if (!version1.databaseModel) return;
+        version1.databaseModel.tables.forEach((tableDatabaseModel, index) => {
+            const table = this.getTableById(tableDatabaseModel.id);
+            if(table == null){
+                const table = new Table(tableDatabaseModel.id);
+                table.importDiagramModel(version1.diagramModel.diagramTables[index]);
+                table.importDatabaseModel(tableDatabaseModel)
+                table.tableColor = REMOVED_COLOR;
+                this.addTable(table);
+            } else {
+                table.tableColor = TABLE_DEFAULT_COLOR;
+                table.primaryKeyColumns.forEach(column => {
+                    column.setBackground(ADDED_COLOR);
+                })
+                table.columns.forEach(column => {
+                    column.setBackground(ADDED_COLOR);
+                })
+                tableDatabaseModel.pkColumns.forEach(columnDatabaseModel => {
+                    const column = table.getColumnById(columnDatabaseModel.id);
+                    if (column == null || !column.primaryKey){
+                        const column = new TableColumn("");
+                        column.importDatabaseModel(columnDatabaseModel);
+                        column.setBackground(REMOVED_COLOR)
+                        table.addColumnWithColumn(column);
+                    } else {
+                        if (
+                            column.unique != columnDatabaseModel.unique ||
+                            column.nullable != columnDatabaseModel.nullable ||
+                            column.name != columnDatabaseModel.name ||
+                            column.type != columnDatabaseModel.type
+                        ){
+                            column.setBackground(CHANGED_COLOR)
+                        } else {
+                            column.setBackground(COLUMN_DEFAULT_COLOR)
+                        }
+                    }
+                })
+
+                tableDatabaseModel.columns.forEach(columnDatabaseModel => {
+                    const column = table.getColumnById(columnDatabaseModel.id);
+                    if (column == null || column.primaryKey){
+                        const column = new TableColumn("");
+                        column.importDatabaseModel(columnDatabaseModel);
+                        column.setBackground(REMOVED_COLOR)
+                        table.addColumnWithColumn(column);
+                    } else {
+                        if (
+                            column.unique != columnDatabaseModel.unique ||
+                            column.nullable != columnDatabaseModel.nullable ||
+                            column.name != columnDatabaseModel.name ||
+                            column.type != columnDatabaseModel.type
+                        ){
+                            column.setBackground(CHANGED_COLOR)
+                        } else {
+                            column.setBackground(COLUMN_DEFAULT_COLOR)
+                        }
+                    }
+                })
+            }
+        })
+
+        for (const referenceDatabaseModel of version1.databaseModel.references) {
+            const reference = this.getReferenceById(referenceDatabaseModel.id);
+            if (reference == null){
+                const toTable = this.getTableById(referenceDatabaseModel.toTableId);
+                const fromTable = this.getTableById(referenceDatabaseModel.fromTableId);
+                if (!toTable || !fromTable) continue;
+                const reference = new Reference(fromTable, toTable, true);
+                reference.setColor(REMOVED_COLOR)
+                reference.importDatabaseModel(referenceDatabaseModel);
+                this.addReferenceWithReference(reference)
+            }else {
+                reference.setColor(REFERENCE_DEFAULT_COLOR);
+            }
+        }
     }
 }
 

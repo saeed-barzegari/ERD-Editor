@@ -24,6 +24,7 @@ export class TableColumn extends Row {
         this.addChild(new Row([
             textPrimaryKey, textForeignKey, iconOption
         ]))
+        this.setPadding(0, 5, 0, 5)
 
         this.setJustifyContent(JustifyContent.SpaceBetween)
 

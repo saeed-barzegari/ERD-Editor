@@ -1,7 +1,7 @@
 <template>
   <notifications />
     <div id="container" class="prevent-select">
-      <router-view/>
+      <router-view :key="$route.fullPath"/>
     </div>
 </template>
 

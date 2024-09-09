@@ -15,6 +15,7 @@ export class Table extends Column implements Selectable {
     private _name: State<string> = new State<string>("");
     private _primaryKeyColumns: TableColumn[] = [];
     private _columns: TableColumn[] = [];
+    private _tableColor = new State("#24262d")
 
     constructor(id = uuid()) {
         super();
@@ -32,11 +33,15 @@ export class Table extends Column implements Selectable {
             divider,
             nonPkColumns
         ])
-            .setBackground("#24262d")
+            .setBackground(this._tableColor.value)
             .setContentWidthFitToParent(true)
             .setBorderColor("#575b68")
             .setBorderWidth(3)
-            .setPadding(5, 5, 5, 5);
+            .setPadding(5, 0, 5, 0);
+
+        this._tableColor.addListener("change", (newColor) => {
+            databaseColumn.setBackground(newColor);
+        })
 
         this.setMargin(5, 5, 5, 5)
             .setBackground("rgba(36,38,45,0)")
@@ -136,6 +141,14 @@ export class Table extends Column implements Selectable {
 
     set name(value: string) {
         this._name.value = value;
+    }
+
+    get tableColor(): string {
+        return this._tableColor.value;
+    }
+
+    set tableColor(value: string) {
+        this._tableColor.value = value;
     }
 
     get primaryKeyColumns(): TableColumn[] {
