@@ -42,7 +42,8 @@ export class Erd extends Viewport {
             if(this.mode == ERDMode.Referencing) {
                 this.tables.forEach(table => {
                     if (table.isInArea(localX, localY)) {
-                        this.addReferenceWithReference(new Reference(this.table, table))
+                        if (this.table)
+                            this.addReferenceWithReference(new Reference(this.table, table))
                         this.mode = ERDMode.Editing;
                     }
                 })
@@ -276,7 +277,8 @@ export class Erd extends Viewport {
     }
 
     removeActiveReference() {
-        this.removeReferenceByReference(this.reference)
+        if (this.reference)
+            this.removeReferenceByReference(this.reference)
     }
 
     removeReferenceByReference(ref:Reference){
