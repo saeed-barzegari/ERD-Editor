@@ -8,6 +8,7 @@ import {TableColumn} from "@/components/erd/table-column";
 import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
 import ExportCode from "@/components/ExportCode.vue";
 import TextToggle from "@/components/TextToggle.vue";
+import {useRoute} from "vue-router";
 
 export default defineComponent({
   components: {TextToggle, ExportCode},
@@ -148,6 +149,7 @@ export default defineComponent({
   mounted() {
     const canvasElement = this.$refs.canvasElement as HTMLCanvasElement;
     const rootElement = this.$refs.root as HTMLElement;
+    const route = useRoute();
     show(canvasElement, rootElement, this.erd as Erd);
 
     this.erd.addListener('edit-table', table => {
@@ -155,10 +157,12 @@ export default defineComponent({
       this.showTableEditor(position.x, position.y);
     })
 
-    this.erd.addListener('contextmenu', (pos, context: ContextMenuContent) => {
-      this.contextMenuContent = context;
-      this.showContextMenu(pos.x, pos.y);
-    })
+    if(route.name == 'editor') {
+      this.erd.addListener('contextmenu', (pos, context: ContextMenuContent) => {
+        this.contextMenuContent = context;
+        this.showContextMenu(pos.x, pos.y);
+      })
+    }
   }
 })
 
