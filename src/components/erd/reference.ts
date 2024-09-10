@@ -248,11 +248,23 @@ export class Reference extends Path {
             fkColumn.foreignKey = pkColumn;
             this.registerColumnToForeignKey(pkColumn, fkColumn)
         }
+        this._identifying = this.checkIdentifying();
+        if (this.identifying)
+            this.emit("changeIdentifying", this._identifying);
     }
 
     remove() {
         this.foreignKeyColumns.forEach(column => {
             this.fromTable.removeColumn(column);
         })
+    }
+
+    checkIdentifying() {
+        let identifying = true;
+        for (const foreignKeyColumn of this.foreignKeyColumns) {
+            if (!foreignKeyColumn.primaryKey)
+                identifying = false;
+        }
+        return identifying;
     }
 }
