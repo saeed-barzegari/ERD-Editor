@@ -9,6 +9,7 @@ export class TableColumn extends Row {
     private _primaryKey = false;
     private _foreignKey:TableColumn | null = null;
     private _type = ""
+    private _default = "";
     private _nullable = false;
     private _unique = false;
 
@@ -98,6 +99,14 @@ export class TableColumn extends Row {
         this._unique = value;
     }
 
+    get default(): string {
+        return this._default;
+    }
+
+    set default(value: string) {
+        this._default = value;
+    }
+
     exportDatabaseModel() {
         return {
             id: this.id,
@@ -105,7 +114,8 @@ export class TableColumn extends Row {
             type: this.type,
             primaryKey: this.primaryKey,
             nullable: this.nullable,
-            unique: this.unique
+            unique: this.unique,
+            default: this.default
         } as ColumnDatabaseModel;
     }
 
@@ -116,5 +126,6 @@ export class TableColumn extends Row {
         this.primaryKey = columnDatabaseModel.primaryKey;
         this.nullable = columnDatabaseModel.nullable;
         this.unique = columnDatabaseModel.unique;
+        this.default = columnDatabaseModel.default
     }
 }

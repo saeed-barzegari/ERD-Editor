@@ -192,7 +192,7 @@ export default defineComponent({
       </ul>
     </div>
 
-    <div id="table-editor" ref="tableEditor" v-show="!tableEditorIsHidden" v-if="erd.table != null">
+    <div id="table-editor" ref="tableEditor" v-show="!tableEditorIsHidden">
       <div class="header">
         <input class="table-name" @focusout="changeTableName" ref="tableName" v-model="erd.table.name">
       </div>
@@ -202,6 +202,7 @@ export default defineComponent({
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <RecommendedInput v-model:value="column.type" placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"/>
+            <input v-model="column.default" placeholder="<Default Value>">
             <div class="options">
               <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
               <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
@@ -223,6 +224,7 @@ export default defineComponent({
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
             <RecommendedInput v-model:value="column.type" placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"/>
+            <input v-model="column.default" placeholder="<Default Value>">
             <div class="options">
               <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
               <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>

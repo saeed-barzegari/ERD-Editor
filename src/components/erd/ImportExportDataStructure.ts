@@ -4,7 +4,8 @@ interface ColumnDatabaseModel {
     type: string,
     primaryKey: boolean,
     nullable: boolean,
-    unique: boolean
+    unique: boolean,
+    default: string
 }
 
 interface TableDatabaseModel {

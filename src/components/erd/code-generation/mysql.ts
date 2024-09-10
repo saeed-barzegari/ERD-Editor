@@ -12,12 +12,21 @@ export function diagramToMySQLCode(erd: Erd) {
                 column += ' NOT NULL'
             if(primaryKeyColumn.unique)
                 column += ' UNIQUE'
+            if(primaryKeyColumn.default.trim().length != 0)
+                column += ` DEFAULT ${primaryKeyColumn.default}`
             columns.push(column)
             constraint.push(`\tPRIMARY KEY (${primaryKeyColumn.name})`)
         }
 
-        for (const column of table.columns) {
-            columns.push(`\t${column.name} ${column.type}`)
+        for (const nonPrimaryKeyColumn of table.columns) {
+            let column = `\t${nonPrimaryKeyColumn.name} ${nonPrimaryKeyColumn.type}`
+            if(!nonPrimaryKeyColumn.nullable)
+                column += ' NOT NULL'
+            if(nonPrimaryKeyColumn.unique)
+                column += ' UNIQUE'
+            if(nonPrimaryKeyColumn.default.trim().length != 0)
+                column += ` DEFAULT ${nonPrimaryKeyColumn.default}`
+            columns.push(column)
         }
 
         for (const reference of erd.getReferencesByFromTable(table)) {

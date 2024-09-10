@@ -247,7 +247,6 @@ export class Reference extends Path {
                 continue;
             fkColumn.foreignKey = pkColumn;
             this.registerColumnToForeignKey(pkColumn, fkColumn)
-            this.foreignKeyColumns.push(fkColumn);
         }
     }
 

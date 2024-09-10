@@ -19,7 +19,7 @@ function logout() {
   <div id="navigator">
     <div class="nav">
       <ul>
-        <li @click="router.push('/home')">Home</li>
+        <li @click="router.push('/')">Home</li>
         <li @click="router.push('/about')">About</li>
       </ul>
     </div>
@@ -65,7 +65,12 @@ function logout() {
 }
 
 #navigator .nav > ul > li{
-  padding: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+#navigator .nav > ul > li:not(:first-child){
+  border-left: 1px solid #828691;
 }
 
 .nav-btn {
