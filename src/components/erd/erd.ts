@@ -5,6 +5,7 @@ import {Reference} from "@/components/erd/reference";
 import {Point} from "@/components/erd/basic/point";
 import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
 import {TableColumn} from "@/components/erd/table-column";
+import {mySQLDataType} from "@/components/erd/data-type/MySQL";
 
 export enum ContextMenuContent {
     TableContextMenu,
@@ -294,6 +295,10 @@ export class Erd extends Viewport {
             if(reference.id == id)
                 return reference;
         }
+    }
+
+    get dataTypes() {
+        return mySQLDataType;
     }
 
     differentBetweenVersions(v1: object | null, v2: object){

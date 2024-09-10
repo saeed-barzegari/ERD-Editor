@@ -1,6 +1,6 @@
 <template>
   <notifications />
-  <NavigatorTopBar v-if="route.name != 'editor' && route.name != 'different'" :key="$route.fullPath"/>
+  <NavigatorTopBar v-if="route.name && route.name != 'editor' && route.name != 'different'" :key="$route.fullPath"/>
     <div id="container" class="prevent-select">
       <router-view :key="$route.fullPath"/>
     </div>

@@ -9,9 +9,10 @@ import {diagramToMySQLCode} from "@/components/erd/code-generation/mysql";
 import ExportCode from "@/components/ExportCode.vue";
 import TextToggle from "@/components/TextToggle.vue";
 import {useRoute} from "vue-router";
+import RecommendedInput from "@/components/RecommendedInput.vue";
 
 export default defineComponent({
-  components: {TextToggle, ExportCode},
+  components: {RecommendedInput, TextToggle, ExportCode},
   computed: {
     ContextMenuContent() {
       return ContextMenuContent
@@ -200,7 +201,7 @@ export default defineComponent({
           <div class="column" v-for="(column, index) in erd.table.primaryKeyColumns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 0, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
-            <input v-model="column.type" placeholder="<Data Type>">
+            <RecommendedInput v-model:value="column.type" placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"/>
             <div class="options">
               <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
               <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
@@ -212,8 +213,8 @@ export default defineComponent({
           <div class="add_column">
             <input placeholder="<Column Name>"
                    @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({name:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
-            <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}">
+            <RecommendedInput placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"
+                   @focusout="(ev:FocusEvent) => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value, primaryKey: true}); (ev.target as HTMLInputElement).value ='';}"/>
           </div>
         </div>
         <hr style="width: 100%">
@@ -221,18 +222,21 @@ export default defineComponent({
           <div class="column" v-for="(column, index) in erd.table.columns" v-bind:key="index">
             <span class="drag" draggable="true" @dragstart="startColumnDrag($event, 1, index)">:</span>
             <input v-model="column.name" placeholder="<Column Name>">
-            <input v-model="column.type" placeholder="<Data Type>">
+            <RecommendedInput v-model:value="column.type" placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"/>
             <div class="options">
               <TextToggle text="NULL" class="text-toggle" v-model:value="column.nullable"/>
               <TextToggle text="UNIQUE" class="text-toggle" v-model:value="column.unique"/>
             </div>
-            <span v-if="!column.foreignKey" @click="erd.table.removeColumn(column)">r</span>
+            <span class="remove" v-if="!column.foreignKey" @click="erd.table.removeColumn(column)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="red" width="12px" height="12px" viewBox="-3.5 0 19 19" class="cf-icon-svg"><path d="M11.383 13.644A1.03 1.03 0 0 1 9.928 15.1L6 11.172 2.072 15.1a1.03 1.03 0 1 1-1.455-1.456l3.928-3.928L.617 5.79a1.03 1.03 0 1 1 1.455-1.456L6 8.261l3.928-3.928a1.03 1.03 0 0 1 1.455 1.456L7.455 9.716z"/></svg>
+            </span>
           </div>
           <div class="add_column">
             <input placeholder="<Column Name>"
                    @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({name:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
-            <input placeholder="<Data Type>"
-                   @focusout="ev => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}">
+            <RecommendedInput placeholder="<Data Type>" v-model:recommendations="erd.dataTypes"
+                   @focusout="(ev:FocusEvent) => {if((ev.target as HTMLInputElement).value.trim() !== '') erd.table.addColumn({type:(ev.target as HTMLInputElement).value}); (ev.target as HTMLInputElement).value ='';}"/>
+
           </div>
           </div>
         </div>
@@ -291,11 +295,13 @@ export default defineComponent({
 .pk-columns {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .non-pk-columns {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 #table-editor .columns input {

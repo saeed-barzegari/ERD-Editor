@@ -19,7 +19,7 @@ function logout() {
   <div id="navigator">
     <div class="nav">
       <ul>
-        <li>Home</li>
+        <li @click="router.push('/home')">Home</li>
         <li @click="router.push('/about')">About</li>
       </ul>
     </div>

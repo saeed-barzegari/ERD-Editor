@@ -45,7 +45,7 @@ const route = useRoute();
 const erd = ref<typeof ERDCanvas>();
 const projectName = ref('');
 const versionNumber = ref(0);
-const loading = ref(false);
+const loading = ref(true);
 const differentModalVisible = ref(false);
 
 axios.get(`http://localhost:8000/project/get_last_version/${route.params['slug']}/`)
